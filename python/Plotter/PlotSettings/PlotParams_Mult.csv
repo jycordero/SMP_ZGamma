@@ -1,0 +1,11 @@
+" ","axes","xtick","ytick","legend","axes.grid"
+"grid","TRUE",,,,
+"titlesize",18,,,,
+"labelsize",13,13,13,,
+"linestyle",,"--",,,"--"
+"labelpad",,,,,
+"fontsize",,,,11,
+"title",,,,,
+"facecolor",,,,,
+"edgecolor",,,,,
+"loc",,,,,
