@@ -11,10 +11,17 @@ import sys
 # In[ ]:
 
 
+from Common.CommonHelper import CommonHelper
+
+
+# In[ ]:
+
+
 class Config:
-    def __init__(self, projectdir, path, era, DataGen, selection, run, LoadVars = []):
-        
-        self.projectdir = projectdir 
+    def __init__(self, path, era, DataGen, selection, run, LoadVars = []):
+        self.confdir = "/home/jcordero/CMS/SMP_ZGamma/conf/config"
+        #self.confdir = "../conf/config"
+        self.projectdir = self.__getProjectDir()
         self.path = path 
         self.era  = era
         self.run  = run
@@ -28,6 +35,23 @@ class Config:
         
         self.dirStructure()
         
+    def __repr__(self):
+        space = len(Config.__name__)
+        spacer = " "*space
+        msg = "{}(path={},\n".format(Config.__name__,self.path)
+        msg += spacer+"era={},\n".format(self.era)
+        msg += spacer+"DataGen={},\n".format(self.era) 
+        msg += spacer+"selection={},\n".format(self.selection) 
+        msg += spacer+"run={},\n".format(self.run) 
+        msg += spacer+"LoadVars={}\n".format(self.LoadVars) 
+        msg += spacer+")\n"
+        msg += spacer+"--> projectdir: {} (extracted from {})\n".format(self.projectdir, self.confdir)
+        msg += spacer+"--> date: {}\n".format(self.date)
+        msg += spacer+"--> figpath: {}\n".format(self.figpath)
+        msg += spacer+"--> jsondir: {}\n".format(self.jsondir)
+        
+        return msg
+    
     def __del__(self):
         del self.projectdir
         del self.path 
@@ -39,6 +63,11 @@ class Config:
         del self.date
         del self.figpath 
         del self.jsondir 
+    
+    def __getProjectDir(self):
+        with open(self.confdir) as f:
+            projectdir = f.read()
+        return projectdir.split('\n')[0]
     
     def __setDate(self):
         import datetime

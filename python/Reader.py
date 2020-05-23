@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[ ]:
 
 
 from Samples.Data      import Data
 import pandas as pd 
+import dask.dataframe as dd
 from root_pandas import read_root
 
 
-# In[1]:
+# In[ ]:
 
 
 class Reader():
     def __init__(self, Config, Print = False):
-        
+        self.Config = Config
         self.projectdir = Config.projectdir
         self.path = Config.path 
         self.era  = Config.era
@@ -31,6 +32,17 @@ class Reader():
             
         self.Print     = Print
         
+    def __repr__(self):
+        space = len(Reader.__name__)
+        spacer = space*" "
+        msg  = "{}(Config={},Print={})".format(Reader.__name__,self.Config,self.Print) 
+        msg += spacer+"--> projectdir: {}".format(self.projectdir)
+        msg += spacer+"--> path: {}".format(self.path)
+        msg += spacer+"--> era: {}".format(self.era)
+        msg += spacer+"--> selection: {}".format(self.selection)
+        msg += spacer+"--> run: {}".format(self.run)
+        return msg
+    
     def read(self, Region = "AB", Type = "analysis", run  = []):
         if run == []:
             run = self.run
@@ -113,6 +125,7 @@ class Reader():
             ''' 
             samples.append(["WJets"])
             samples.append(["TTTo2L2Nu"])         
+            samples.append(["WWTo2L2Nu","ZZTo2L2Nu","ZZTo2L2Q","ZZTo4L","WZTo2L2Q","WZTo3LNu"])
         ###############
         
         data = []
@@ -142,7 +155,7 @@ class Reader():
             reduced.append(pd.read_csv(filename))
             
             
-        isData = [True if name == 'DoubleMuon_'+era else False for name in Names]
+        isData = [True if name == 'DoubleMuon_'+self.era else False for name in Names]
         data = [Data(projectdir = self.projectdir, df = reduced[i],nameFile = Names[i],data = isData[i], Print=False)  for i in range(len(Names))]
 
         

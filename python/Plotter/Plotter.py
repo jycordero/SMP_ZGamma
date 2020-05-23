@@ -4,22 +4,10 @@
 # In[ ]:
 
 
-import sys
-
-
-# In[ ]:
-
-
-projectdir = "/home/jcordero/CMS/JYCMCMS/SMP_ZG/" 
-sys.path.append(projectdir+"python")
-
-
-# In[ ]:
-
-
 import numpy as np
 import pandas as pd
 
+import os 
 import array 
 
 import matplotlib as mpl
@@ -59,6 +47,15 @@ class Plotter(object):
         self.Help = Helper(Config=self.Config)
         
         self.HelpPlot = Helper.Plot
+    
+    def __repr__(self):
+        space = len(Plotter.__name__)
+        spacer = " "*space
+        msg = "{}(Config = {})\n".format(Plotter.__name__,self.Config) 
+        msg += spacer+"--> self.figpath: {}\n".format(self.figpath) 
+        msg += spacer+"--> self.__binFile: {}\n".format(self.__binFile) 
+        msg += spacer+"--> self.__rangeFile: {}\n".format(self.__rangeFile) 
+        return msg
     
     def __del__(self):
         del self.Config
@@ -154,7 +151,11 @@ class Plotter(object):
                     );
     
     def SaveFig(self,fig,figpath,extra,name):
-        fig.savefig(self.figpath+extra+name+".png")
+        if self.figpath == "":
+            os.mkdir("figs")
+            fig.savefig("figs/"+extra+name+".png")
+        else:
+            fig.savefig(self.figpath+extra+name+".png")
         
     def AddToPath(self,addFolder):
         self.folder += addFolder

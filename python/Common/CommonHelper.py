@@ -1,20 +1,58 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[9]:
 
 
 import numpy as np 
-from scipy.special import wofz
-import scipy.special as spc
 import array
+import scipy.special as spc
+
+from functools import wraps
 
 
-# In[ ]:
+# In[15]:
 
 
 class CommonHelper:
+    class Log:       
+        @staticmethod
+        def logger(obj):
+            import logging
+            logging.basicConfig(filename="log/{}.log".format(obj.__name__), level=logging.INFO)
+            
+            @wraps(obj)
+            def wrapper(*args,**kwargs):
+                logging.info(
+                            "Input args: {}, kwargs:{}".format(args,kwargs)
+                            )
+                return obj(*args **kwargs)
+            return wrapper
+        
+        @staticmethod
+        def timer(obj):
+            import time
+            @wraps(obj)
+            def wrapper(*arg, **kwargs):
+                t1 = time.time()
+                result =  obj(*arg, **kwargs)
+                t2 = time.time() -t1
+                return result
+            return wrapper
+        
+    class Read:
+        @staticmethod
+        def openJson(file):
+            import json
+            with open(file) as f:
+                JS = f.read()
+            return json.loads(JSON)
+                
+            
+                
+            
     class Format:
+        @staticmethod
         def ConvertString2Float(varS):
             if varS == '' or varS == ' ':
                 convert = False
@@ -31,6 +69,7 @@ class CommonHelper:
             return convert        
 
     class Plot:
+        @staticmethod
         def BinFormat(Bins,ranges = None,Type='ranges', Print=False):
             bins = []
             if Bins == []:
@@ -57,7 +96,9 @@ class CommonHelper:
                         bins.append(i*step+ranges[0])
 
                 elif Type == 'center':
-                    bins = np.array(self.BinFormat(Bins = Bins,Type='edges'))
+                    for i in range(Bins+1):
+                        bins.append(i*step+ranges[0])
+                    bins = np.array(bins)
                     bins = (bins[:-1]+bins[1:])/2
             else:
                 if Print:
@@ -77,11 +118,18 @@ class CommonHelper:
                         bins.append(Bins[-1][1])
                     bins = array.array("f",bins)
                 elif Type == 'center':
-                    bins = np.array(self.BinFormat(Bins = Bins,Type='edges'))
+                    if type(Bins[0]) is int or type(Bins[0]) is float or type(Bins[0]) is np.int64:
+                        bins = Bins
+                    else:
+                        for b in Bins:
+                            bins.append(b[0])
+                        bins.append(Bins[-1][1])
+                    bins = np.array(bins)
                     bins = (bins[:-1]+bins[1:])/2
 
             return bins
         
+        @staticmethod
         def BinIndex(Data,Low,Max,Abs = False):
             if Abs:
                 return np.logical_and(np.abs(Data) >= Low, np.abs(Data) <  Max)
@@ -89,54 +137,52 @@ class CommonHelper:
                 return np.logical_and(np.array(Data) >= Low, np.array(Data) <  Max)   
         
     class Math:
+        import numpy as np         
+        
         ###########
         ### Math
+        @staticmethod
         def Exp(x,*arg):
             lamb,x0 = arg
             return np.exp(-lamb*(x-x0))
-        def RooCMSShape(x,*arg):
-            alpha, beta, peak, gamma = arg
-
-            erf = spc.erfc((alpha - x)*beta)
-            u = (x-peak)*gamma
-
-            u = np.exp(-u)   
-            #u[u <- 70] = u[u <- 70]*0 + 1e20
-            #u[u > 70]  = u[u > 70]*0
-            #ind  =  np.logical_and(u>=-70, u<=70)
-            #u[ind]     = np.exp(-u[ind])
-
-            return erf*u
+        
+        @staticmethod
         def G(x, *arg):
             """ Return Gaussian line shape at x with HWHM alpha """
             alpha, mean = arg
             return np.sqrt(np.log(2) / np.pi) / alpha* np.exp(-((x-mean) / alpha)**2 * np.log(2))
 
+        @staticmethod
         def L(x, *arg):
             """ Return Lorentzian line shape at x with HWHM gamma """
             gamma, mean = arg
             return gamma / np.pi / ((x-mean)**2 + gamma**2)
 
+        @staticmethod
         def Voigt(x, *arg):
+            from scipy.special import wofz
             """ Return Voigt-Weigner line shape at x"""
             alpha, gamma, mean = arg
             sigma = alpha / np.sqrt(2 * np.log(2))
             return np.real(wofz(((x-mean) + 1j*gamma)/sigma/np.sqrt(2))) / sigma                                                                   /np.sqrt(2*np.pi)
-
+        @staticmethod
         def NLL(DATA,Temp,*arg):
             Model = Temp(*arg)
             return np.sum(Model) - np.sum(DATA*np.log(Model))
 
+        @staticmethod
         def CHI2(DATA,Temp,*arg):
             Model = Temp(*arg)
             DATA[DATA==0] = 1
             SIGMA_2 = (1/DATA + 1/Model)**(-1)
             return np.sum((Model-DATA)**2/SIGMA_2)
 
-        def gauss(self,x,*a):
+        @staticmethod
+        def gauss(x,*a):
             return a[0]*np.exp(-(x-a[1])**2/(2*a[2]**2)) + a[3]
         
-        def crystal_ball(self,x,*params):
+        @staticmethod
+        def crystal_ball(x,*params):
             x = x+0j 
             N, a, n, xb, sig = params
             if a < 0:
@@ -154,20 +200,44 @@ class CommonHelper:
             except:
                 return totat
             return total
-
+        
+        @staticmethod
         def Template(Nsig,Nbkg,Sig,Bkg):
             return Nsig * (Sig/np.sum(Sig)) + Nbkg * (Bkg/np.sum(Bkg))
         
     class Stat:
+        @staticmethod
+        def assErr(k,N):
+            a, b = 0.001,1
+            steps = 1000
+            beta = np.arange(a,b,step = (b-a)/steps)
+
+            Beta  = spc.betainc(k+1,N-k+1,beta)
+            Sols = [[100 if np.isnan(Bs-As-lamb) else np.abs(Bs-As-lamb) for Bs in Beta] for As in Beta]
+
+            i = int(np.argmin(Sols)/steps)
+            j = int(np.argmin(Sols)- i*steps)
+
+            intLow, intHigh = beta[i],beta[j]
+            print(np.argmin(Sols),np.min(Sols),Sols[i][j])
+            print(i,j)
+            
+        @staticmethod
+        def Template(Nsig,Nbkg,Sig,Bkg):
+            return Nsig * (Sig/np.sum(Sig)) + Nbkg * (Bkg/np.sum(Bkg))
+        
+        @staticmethod
         def GetCDF(dist):
             return np.cumsum(dist/np.sum(dist))      
         
+        @staticmethod
         def CHI2(Exp,Obs):
             if np.sum(Exp) == 0:
                 return np.sum((Exp-Obs)**2/np.sqrt(Exp))
             else:
                 return np.sum((Exp-Obs)**2)
             
+        @staticmethod
         def Sampling(dist,N):
             indices = []
 
@@ -177,4 +247,10 @@ class CommonHelper:
                 indices.append(np.sum(CDF < samp))
             hist = np.histogram(dist[1][indices],bins=np.arange(-1,1.1,step=0.1))
             return np.array(hist[0])
+
+
+# In[ ]:
+
+
+
 

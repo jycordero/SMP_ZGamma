@@ -1,0 +1,22 @@
+{
+	"default":{
+		"color":"r",
+		"linestyle":"-"
+	},
+	"pass":{
+		"color":"r",
+		"linestyle":"-"
+	},
+	"fail":{
+		"color":"b",
+		"linestyle":"-"
+	},
+	"efficiency":{
+		"color":"b",
+		"linestyle":"-"
+	},
+	"scalefactor":{
+		"color":"b",
+		"linestyle":"-"
+	}
+}

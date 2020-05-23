@@ -1,7 +1,7 @@
 #bin/bash!
 
-export PYTHONWORKDIR=/home/jcordero/CMS/JYCMCMS/SMP_ZG/python
-export PYTHONPATH=$PYTHONPATH:/home/jcordero/CMS/JYCMCMS/SMP_ZG/python
+export PYTHONWORKDIR=/home/jcordero/CMS/SMP_ZGamma/python
+export PYTHONPATH=$PYTHONPATH:/home/jcordero/CMS/SMP_ZGamma/python
 
 TOPDIR=$PWD
 SUBDIRS=( Plotter  Samples Corrections )

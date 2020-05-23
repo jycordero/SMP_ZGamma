@@ -1,19 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[36]:
-
-
-import sys
-
-
-# In[37]:
-
-
-projectdir = "/home/jcordero/CMS/JYCMCMS/SMP_ZG/" 
-sys.path.append(projectdir+"python")
-
-
 # In[ ]:
 
 
@@ -21,9 +8,10 @@ import numpy as np
 import json
 
 
-# In[38]:
+# In[1]:
 
 
+from Common.CommonHelper import CommonHelper
 from Common.Stack import Stack
 from Samples.Data import Data
 
@@ -34,7 +22,8 @@ from Samples.Data import Data
 class DataStack( Stack ):
     def __init__(self, data):
         Stack.__init__(self,data)
-        self.jsonProp = projectdir+"json/plot/plot_conf.json"
+        self.projectdir = self.__getProjectDir()
+        self.jsonProp = self.projectdir+"json/plot/plot_conf.json"
         
         self.colors = self.getColors()
         self.legend = self.getLegends()
@@ -44,6 +33,11 @@ class DataStack( Stack ):
         del self.colors
         del self.legend
         del self.jsonProp
+    
+    def __getProjectDir(self):
+        with open("../conf/config") as f:
+            projectdir = f.read()
+        return projectdir.split('\n')[0]
     
     def __getDataProp(self):
         with open(self.jsonProp) as f:

@@ -116,8 +116,6 @@ class Data(object):
         self.df = df
         self.sampLength = len(self.df)
         self.cuts       = [True for _ in range(self.sampLength)] 
-        #self.weight  = self.df.weights
-        #self.weights = self.weight
 
         self.weight  = np.array(self.df.weights)
         self.weights = np.array(self.weight)
