@@ -1,3 +1,0 @@
-{
-	"plots":"/home/jcordero/CMS/JYCMCMS/SMP_ZG",
-}

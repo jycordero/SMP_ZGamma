@@ -1,0 +1,6 @@
+Jobs status:                    finished     		100.0% (5/5)
+   1 finished     T2_US_UCSD              5:41:31       1902         92          3          0   11:38:34               0
+   2 finished     T2_US_Caltech           6:20:05       1985         98          1          0    3:07:49               0
+   3 finished     T2_US_Caltech           5:46:35       1992         97          1          0    3:02:49               0
+   4 finished     T2_US_UCSD              5:39:35       1920         92          2          0    7:30:21               0
+   5 finished     T2_US_UCSD              5:29:25       1914         95          2          0    8:17:34               0

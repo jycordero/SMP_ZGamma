@@ -1,0 +1,5 @@
+Jobs status:                    finished     		100.0% (4/4)
+   1 finished     T2_US_Vanderbilt        1:06:42       1687         95          1          0    1:45:05               0
+   2 finished     T2_US_Vanderbilt        1:27:48       1706         92          1          0    1:52:54               0
+   3 finished     T2_US_Vanderbilt        4:53:33       1932         95          2          0   10:54:34               0
+   4 finished     T2_US_Vanderbilt        2:25:47       1913         94          1          0    4:04:20               0

@@ -1,0 +1,7 @@
+Jobs status:                    failed       		  0.2% (   5/3080)
+   5 jobs failed in postprocessing step
+   1 failed       T2_US_Caltech           4:07:12       1730         97          4          0 438940:52:21  Postprocessing failed
+   2 failed       T2_US_Caltech           3:08:36       1697         94          3          0 438939:20:56  Postprocessing failed
+   3 failed       T2_US_Caltech           2:11:34       1670         95          3          0 438937:37:58  Postprocessing failed
+   4 failed       T2_US_Florida           2:46:28       2089         90          3          0 438939:28:42  Postprocessing failed
+   5 failed       T2_US_Florida           1:47:39       1800         85          3          0 438938:56:08  Postprocessing failed

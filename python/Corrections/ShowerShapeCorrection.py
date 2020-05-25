@@ -4,21 +4,6 @@
 # In[1]:
 
 
-import sys
-import os
-import datetime
-
-
-# In[2]:
-
-
-projectdir = "/home/jcordero/CMS/JYCMCMS/SMP_ZG/"
-sys.path.append(projectdir+"python")
-
-
-# In[3]:
-
-
 ## Python dependencies 
 import matplotlib as mlp
 import matplotlib.pyplot as plt
@@ -27,7 +12,13 @@ import numpy as np
 import pandas as pd
 
 
-# In[4]:
+# In[ ]:
+
+
+
+
+
+# In[2]:
 
 
 from numpy.random    import uniform
@@ -37,19 +28,38 @@ from root_pandas import read_root
 from ROOT import TFile, TTree
 
 
-# In[5]:
+# In[3]:
 
 
 # My Dependencies
-from Plotter.Plotter import Plotter
-from Plotter.Helper  import Helper
-from Samples.Data    import Data
+#from Samples.Data      import Data
+from Plotter.Helper    import Helper
+from Data import Data
+from Helper import Helper
 
-from Reader import Reader
-from Config import Config
+#import Samples
+import Plotter
 
 
-# In[6]:
+# In[ ]:
+
+
+
+
+
+# In[4]:
+
+
+import os, datetime
+
+
+# In[ ]:
+
+
+
+
+
+# In[5]:
 
 
 def dirStructure(figpath):
@@ -87,18 +97,16 @@ def dirSubStructure(path):
         print("Subdirectory for " + path + " already exists or failed.")
 
 
-# In[7]:
+# In[6]:
 
 
 #selection = 'mumug'
 #selection = 'elelg'
 selection = 'ee'
 
-#era = "2016"
 era = "2017"
-#era = "2018"
 
-if   era == "2016":
+if era == "2016":
     run = ['B','C','D','E','F','G','H']
     #DataGen = 'rereco'
     DataGen = 'legacy'
@@ -128,25 +136,14 @@ elif era == "2017":
         DataGen = 'rereco'
         #SampleSet = 'EfficiencyCorrection/files_zee/CorrShower'
         SampleSet = 'EfficiencyCorrection/files_zee/V4_phID_isConv'
-elif era == "2018":
-    if selection == "mumug" or selection == "elelg":
-        run = ['A','B','C','D']
-        DataGen = 'rereco'
-        #SampleSet = 'V1_trigBits'
-        SampleSet = 'V2_trigBits_pu'
-    elif selection == "ee":
-        run = ['A','B','C','D']
-        DataGen = 'rereco'
-        #SampleFolder = 'V1_trigBits'
-        SampleFolder = 'V2_trigBits_pu'        
-        SampleSet = 'EfficiencyCorrection/files_zee/' + SampleFolder
-        
+
 path    = "/home/jcordero/CMS/data_"+era+"/"+DataGen+"/SMP_ZG/Files/"+selection+"/"+SampleSet+"/"
 figpath = "/home/jcordero/CMS/JYCMCMS/SMP_ZG/figs/"+era+"/"+DataGen+"/"+selection+"/"
 
 figpath = dirStructure(figpath)
 
-Help    = Helper()
+Help    = Plotter.Helper.Helper()
+#Help    = Helper()
 
 LoadVars = [
             #'runNumber','evtNumber',
@@ -166,7 +163,7 @@ LoadVars = [
     
             'photonOneR9',
             #'photonOneSieie',
-            #'photonOneHoverE',
+            'photonOneHoverE',
     
             #'photonOneIneu','photonOneIph','photonOneIch',
             #'photonOneSieip',
@@ -191,66 +188,54 @@ LoadVars = [
             ]
 
 
+# In[7]:
+
+
+print(path,'\n',
+      era,'\n',
+      run,
+     )
+
+
 # In[8]:
 
 
-config = Config(
-                projectdir = projectdir,
-                path       = path,
-                era        = era,
-                DataGen    = DataGen,
-                run        = run,
-                selection  = selection,
-                LoadVars   = LoadVars,
-                )
+# --------------------------------------
+#  Data
+# ---------------------------------------
+if selection   == 'mumug':
+    DoubleLepton = [Data(path+"DoubleMuon/","DoubleMuon_"+era,trigger = r,era = era,data=True, var = LoadVars) for r in run]
+elif selection == 'elelg':
+    DoubleLepton = [Data(path+"DoubleEG/","DoubleEG_"+era,trigger = r,era = era, data=True, var = LoadVars) for r in run]
+elif selection == 'ee':
+    #SingleLepton = [Data(path+"SingleElectron/","Electron_"+era,trigger = r,era = era, data=True, var = LoadVars) for r in run]
+    SingleLepton = [Data(path+"SingleElectron/","Electron_"+era,trigger = r,era = '2017_RunD', data=True, var = LoadVars) for r in run]
+    
+    
+#if selection   == 'mumug':
+#    DoubleLepton = [Samples.Data.Data(path+"DoubleMuon/","DoubleMuon_"+era,trigger = r,data=True) for r in run]
+#elif selection == 'elelg':
+#    DoubleLepton = [Samples.Data.Data(path+"DoubleEG/","DoubleEG_"+era,trigger = r,data=True) for r in run]
 
 
-Read = Reader(config)
+# In[9]:
 
 
-# In[ ]:
-
-
-#data = Read.read( reduce = False )
-
-Data = Read.rootReadMC("Electron_"+config.era)
-DYJets = Read.rootReadMC("DYJets")
-
-
-# In[14]:
-
-
-
-
-
-# In[15]:
-
-
-from Plotter.ConfigPlot import ConfigPlot
-
-
-# In[17]:
-
-
-ConfigPlot( config.projectdir, "DYJets" )
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+if selection   == 'mumug':
+    Leptons = DoubleLepton[0]
+    for i in np.arange(len(DoubleLepton[1:])):
+        Leptons =   Leptons + DoubleLepton[1]
+        del DoubleLepton[1]
+elif selection == "mumu":
+    Leptons = DoubleLepton[0]
+    for i in np.arange(len(DoubleLepton[1:])):
+        Leptons =   Leptons + DoubleLepton[1]
+        del DoubleLepton[1]
+elif selection == "ee":
+    Leptons = SingleLepton[0]
+    for i in np.arange(len(SingleLepton[1:])):
+        Leptons =   Leptons + SingleLepton[1]
+        del SingleLepton[1]
 
 
 # In[10]:
@@ -1437,7 +1422,7 @@ mlp.rcParams['legend.fontsize'] = 13
 
 if 'S4' in LoadVars:
     for d in data:
-        d.df["photonOneS4"]    = d.df.photonOneE2x2/d.df.photonOneE5x5
+        d.df["photonOneS4"] = d.df.photonOneE2x2/d.df.photonOneE5x5
         d.df["photonOneS4_EE"] = d.df.photonOneE2x2_EE/d.df.photonOneE5x5_EE
         d.df["photonOneS4_EB"] = d.df.photonOneE2x2_EB/d.df.photonOneE5x5_EB
 

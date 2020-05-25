@@ -1,74 +1,148 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 from ROOT import TFile, TMVA
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from root_pandas import read_root 
 import sys
 
-from Plotter.ConfigPlot import ConfigPlot
-
-
-# In[ ]:
-
-
 class Data(object):
     def __init__(self, 
-                 projectdir = '',
-                 datafolder = '',
+                 folderFile = '',
                  nameFile   = '',
                  trigger    = '',
                  era        = '',
                  data       = False,
-                 signal     = False,
                  flag       = False,
                  var        = [],
                  df         = pd.DataFrame(),
-                 Print      = False,
+                 Print      = True,
                 ):
-        self.projectdir = projectdir
-        self.folder  = datafolder
+        self.folder  = folderFile
         self.name    = nameFile
         self.trigger = trigger
         self.data    = data
-        self.signal  = signal
         self.era     = era
         self.flag    = flag
         self.file    = None
         self.df      = df
         self.var     = var
-        self.Print = Print
-        
-        
-        if self.projectdir != '':
-            self.Config    = ConfigPlot( self.projectdir, self.name )
         
         self.sampLength = 0
         self.Topo = Topology(self.era)
-        
-
-        if not self.df.empty:
-            self.__readDF()
-        else:
-            self.__readRoot()
-
-    def __getitem__(self,key):
-        if not self.df.empty:
-            try:
-                return self.df[key]
-            except:
-                print("Invalid Key")
-        else:
-            print("Data Frame is empty")
+                     
+        if not df.empty:
+            self.df = df
+            self.sampLength = len(self.df)
+            self.cuts       = [True for _ in range(self.sampLength)] 
+            #self.weight  = self.df.weights
+            #self.weights = self.weight
             
-    def __len__(self):
-        return self.df.shape[0]
-    
+            self.weight  = np.array(self.df.weights)
+            self.weights = np.array(self.weight)
+            
+            self.puWeight = self.df.puWeight
+            
+            self.TotalEventBin = 31       
+            self.TotalEvent    = [0 for _ in range(self.TotalEventBin)]
+        else:
+            ### Reading the Data/MC
+            if data:
+                if Print:
+                    print('----------------- DATA --------------------------')
+                    print('Opening    File::' + folderFile + "output_" + self.name + self.trigger + "_v.root")
+                    print('Opening    tree::'   +"   tree_" + self.name + self.trigger)
+                    print('-------------------------------------------------')
+                try:
+                    if len(self.var) > 0:
+                        self.df   = read_root(folderFile + "output_" + self.name + self.trigger +"_v.root",columns = self.var)
+                    else:
+                        self.df   = read_root(folderFile + "output_" + self.name + self.trigger +"_v.root")
+                    self.file = TFile    (folderFile + "output_" + self.name + self.trigger +"_v.root",'read')
+                    self.sampLength = len(self.df.nPV)
+                except:
+                    self.file = None
+                    self.df = pd.DataFrame()
+                    self.sampLength = 0
+            else :
+                if flag:
+                    if Print:
+                        print('-------------------- MC -----------------------')
+                        print('Opening    File::' + folderFile + "output_" + self.name + self.trigger + "_0.root")
+                        print('Opening    tree::' + "   tree_" + self.name + self.trigger)           
+                        print('-----------------------------------------------')   
+
+                    try:
+                        if len(self.var) > 0:
+                            self.df = read_root(folderFile + "output_" + self.name + self.trigger + "_0.root",columns = self.var)
+                        else:
+                            self.df = read_root(folderFile + "output_" + self.name + self.trigger + "_0.root")
+                        self.file = TFile(folderFile + "output_" + self.name + self.trigger + "_0.root")
+                        self.sampLength = len(self.df.nPV)
+                    except:
+                        self.file = None
+                        self.df = pd.DataFrame()
+                        self.sampLength = 0
+                else :
+                    if Print:
+                        print('-------------------- MC -----------------------')
+                        print('Opening    File::' + folderFile + "output_" + self.name + self.trigger + "_0.root")
+                        print('Opening    tree::' + "   tree_" + self.name.lower())# + self.trigger)
+                        print('-----------------------------------------------')            
+                    try:
+                        if len(self.var) > 0:
+                            self.df = read_root(folderFile + "output_" + self.name + self.trigger + "_0.root",columns = self.var)
+                        else:
+                            self.df = read_root(folderFile + "output_" + self.name + self.trigger + "_0.root")
+                        self.file = TFile(folderFile + "output_" + self.name + self.trigger + "_0.root")
+                        self.sampLength = len(self.df.nPV)
+                    except:
+                        self.file = None
+                        self.df   = pd.DataFrame()
+                        self.sampLength = 0
+
+            self.cuts = [True for _ in range(self.sampLength)] 
+
+            self.TotalEventBin = 31       
+            self.TotalEvent    = [0 for _ in range(self.TotalEventBin)]
+
+            if self.file != None:
+                for i in range(self.TotalEventBin):
+                    self.TotalEvent[i]    = self.TotalEvents(i)            
+                #self.weights  = self.Weights(self.era)
+                #self.weight   = self.Weights(self.era)   
+                
+                self.weights  = np.array(self.Weights(self.era))
+                self.weight   = np.array(self.Weights(self.era) )  
+                
+                self.puWeight = np.ones(len(self.weight))
+
+                try:
+                    for attr in self.df.columns:
+                        self.df[attr+'_EE'] = self.df[attr][np.abs(self.df.photonOneEta) > 1.48 ]
+
+                    for attr in self.df.columns:
+                        self.df[attr+'_EB'] = self.df[attr][np.abs(self.df.photonOneEta) <= 1.48 ]
+                except:
+                    err = sys.exc_info()[0]
+                    print( "<p>Error: %s</p>" % err )
+            else:
+                for i in range(self.TotalEventBin):
+                    self.TotalEvent[i]    = 0
+                #self.weights  = self.Weights(self.era)
+                #self.weight   = self.Weights(self.era)
+                
+                self.weights  = np.array(self.Weights(self.era))
+                self.weight   = np.array(self.Weights(self.era))
+                
+                self.puWeight = np.ones(len(self.weight))
+                   
     def __add__(self,other):
         Other = Data()
         
@@ -102,140 +176,7 @@ class Data(object):
             print('-/!\- Could not sum!')
         
         return Other
-        
-    def __setName(self,name):
-        self.name = name
-    def __setDf(self,name,value):
-        self.df[name] = value
-    def __setCut(self,value):
-        self.cuts = value
-    def __setWeight(self,value):
-        self.weight = value
-        
-    def __readDF(self):
-        self.df = df
-        self.sampLength = len(self.df)
-        self.cuts       = [True for _ in range(self.sampLength)] 
-
-        self.weight  = np.array(self.df.weights)
-        self.weights = np.array(self.weight)
-
-        self.puWeight = self.df.puWeight
-
-        self.TotalEventBin = 31       
-        self.TotalEvent    = [0 for _ in range(self.TotalEventBin)]        
-        
-    def __readRoot(self):
-        ### Reading the Data/MC
-        if self.data:
-            rootfile = self.folder + "output_" + self.name + self.trigger + "_v.root"
-            treefile = "tree_" + self.name + self.trigger
-            
-            if self.Print:
-                print('----------------- DATA --------------------------')
-                print('Opening    File::' + rootfile)
-                print('Opening    tree::'   +"   "+treefile)
-                print('-------------------------------------------------')
-
-            try:
-                if len(self.var) > 0:
-                    self.df   = read_root(rootfile, columns = self.var)
-                else:
-                    self.df   = read_root(rootfile)
-                self.file = TFile    (rootfile,'read')
-                self.sampLength = self.df.shape[0]
-            except:
-                self.file = None
-                self.df = pd.DataFrame()
-                self.sampLength = 0
-        else :
-            rootfile = self.folder + "output_" + self.name + self.trigger + "_0.root"
-            treefile = "tree_" + self.name + self.trigger
-            
-            if self.flag:
-                if self.Print:
-                    print('-------------------- MC -----------------------')
-                    print('Opening    File::' + rootfile)
-                    print('Opening    tree::' + "   "+treefile)           
-                    print('-----------------------------------------------')   
-
-                try:
-                    if len(self.var) > 0:
-                        self.df = read_root(rootfile,columns = self.var)
-                    else:
-                        self.df = read_root(rootfile)
-                    self.file = TFile(rootfile)
-                    self.sampLength = self.df.shape[0]
-                except:
-                    self.file = None
-                    self.df = pd.DataFrame()
-                    self.sampLength = 0
-            else :
-                if self.Print:
-                    print('-------------------- MC -----------------------')
-                    print('Opening    File::' + self.folder + "output_" + self.name + self.trigger + "_0.root")
-                    print('Opening    tree::' + "   tree_" + self.name.lower())# + self.trigger)
-                    print('-----------------------------------------------')            
-                try:
-                    if len(self.var) > 0:
-                        self.df = read_root(rootfile,columns = self.var)
-                    else:
-                        self.df = read_root(rootfile)
-                    self.file = TFile(rootfile)
-                    self.sampLength = self.df.shape[0]
-                except:
-                    self.file = None
-                    self.df   = pd.DataFrame()
-                    self.sampLength = 0
-
-        self.cuts = [True for _ in range(self.sampLength)] 
-
-        self.TotalEventBin = 31       
-        self.TotalEvent    = [0 for _ in range(self.TotalEventBin)]
-
-        if self.file != None:
-            for i in range(self.TotalEventBin):
-                self.TotalEvent[i]    = self.TotalEvents(i)            
-            #self.weights  = self.Weights(self.era)
-            #self.weight   = self.Weights(self.era)   
-
-            self.weights  = np.array(self.Weights(self.era))
-            self.weight   = np.array(self.Weights(self.era) )  
-
-            self.puWeight = np.ones(len(self.weight))
-
-            try:
-                for attr in self.df.columns:
-                    self.df[attr+'_EE'] = self.df[attr][np.abs(self.df.photonOneEta) > 1.48 ]
-
-                for attr in self.df.columns:
-                    self.df[attr+'_EB'] = self.df[attr][np.abs(self.df.photonOneEta) <= 1.48 ]
-            except:
-                err = sys.exc_info()[0]
-                print( "<p>Error: %s</p>" % err )
-        else:
-            for i in range(self.TotalEventBin):
-                self.TotalEvent[i]    = 0
-            #self.weights  = self.Weights(self.era)
-            #self.weight   = self.Weights(self.era)
-
-            self.weights  = np.array(self.Weights(self.era))
-            self.weight   = np.array(self.Weights(self.era))
-
-            self.puWeight = np.ones(len(self.weight))
-        
-    def size(self):
-        return len(self)
-    
-    def getWeight(self,weightCorrection = False):
-        
-        if weightCorrection and not self.data:
-            weight = self.GetWithCuts('puWeight')*self.GetWithCuts('weight')
-        else:
-            weight = self.GetWithCuts('weight')
-            
-        return weight
-    
+                
     # ---------------
     # Num of events and SF/weights   
     def TotalEvents(self,n):
@@ -262,7 +203,8 @@ class Data(object):
             return [    1              for _ in range(self.sampLength)]   
         else :
             try:
-                return list(np.array(self.df.genWeight)*np.array(self.df.eventWeight)*np.array([self.ScaleFactor(era) for _ in range(self.size())]))
+                #return list(np.array(self.df.genWeight)*np.array(self.df.eventWeight)*self.df.photonIDWeight*np.array([self.ScaleFactor(era) for _ in range(self.sampLength)]))
+                return list(np.array(self.df.genWeight)*np.array(self.df.eventWeight)*np.array([self.ScaleFactor(era) for _ in range(self.sampLength)]))
             except:
                 return [    1              for _ in range(self.sampLength)]   
     # ---------------
@@ -358,7 +300,7 @@ class Data(object):
         sefl.df["ShowerShapeBDT"] = ShowerShapeBDT
 
 
-# In[ ]:
+# In[15]:
 
 
 class Topology(object):
@@ -497,7 +439,7 @@ class Topology(object):
         
 
 
-# In[ ]:
+# In[13]:
 
 
 

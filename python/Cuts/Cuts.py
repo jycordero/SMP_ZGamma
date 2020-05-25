@@ -398,7 +398,6 @@ class Cuts():
                                                  )
                         R1_Region = np.logical_and( R11_Region, R12_Region)
                         d.AddCuts(R1_Region)
-                        
 
 
 # In[5]:

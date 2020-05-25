@@ -1,19 +1,16 @@
 #bin/bash!
 
-export PYTHONWORKDIR=/home/jcordero/CMS/SMP_ZGamma/python
-export PYTHONPATH=$PYTHONPATH:/home/jcordero/CMS/SMP_ZGamma/python
+export PARENTWORKDIR=/home/jcordero/CMS/JYCMCMS/SMP_ZG/python
+export PYTHONPATH=$PYTHONPATH:/home/jcordero/CMS/JYCMCMS/SMP_ZG/python
 
-TOPDIR=$PWD
-SUBDIRS=( Plotter  Samples Selections Efficiency Corrections Cuts Common )
+TOPDIR=$PARENTWORKDIR
+SUBDIRS=( Plotter  Samples Corrections)
 for DIR in ${SUBDIRS[@]} 
 do
-	jupyter nbconvert --to script *.ipynb
-	cd $PYTHONWORKDIR/$DIR/jupyter
+	cd $DIR
 	echo "In " $PWD
-	echo "Performing : jupyter nbconvert --to script $PYTHONWORKDIR/$DIR/*.ipynb"
-	jupyter nbconvert --to script *.ipynb
-	mv *.py $PYTHONWORKDIR/$DIR
-
+	echo "Performing : jupyter nbconvert --to script $TOPDIR/$DIR/*.ipynb"
+	jupyter nbconvert --to script $TOPDIR/$DIR/*.ipynb
 	cd $TOPDIR
 	printf "\n\n"
 done
