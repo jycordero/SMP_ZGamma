@@ -44,7 +44,7 @@ class ConfigMatplotlib:
         
 
 
-# In[31]:
+# In[32]:
 
 
 if __name__ == "__main__":

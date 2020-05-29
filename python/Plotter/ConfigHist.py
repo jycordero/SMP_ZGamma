@@ -13,6 +13,13 @@ from Common.CommonHelper import CommonHelper
 class ConfigHist:
     confpath="/home/jcordero/CMS/SMP_ZGamma/json/plot/"
     
+    def getProperties(self,name=""):
+        prop = {}
+        prop['color']    = self.getColor(name) 
+        prop['label']    = self.getLabel(name)
+        prop['histtype'] = self.getHisttpe(name)
+        return prop    
+    
     def getMarket(self,name):
         return CommonHelper.Read.openJson(self.confpath+"plot_conf.json")[name]['plot']['marker']
     

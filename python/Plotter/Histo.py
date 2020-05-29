@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from Plotter.ConfigHist import ConfigHist
 from Plotter.ConfigMatplotlib import ConfigMatplotlib
 from Common.CommonHelper import CommonHelper
 
@@ -15,7 +16,7 @@ from Common.CommonHelper import CommonHelper
 # In[ ]:
 
 
-class Histo( ConfigMatplotlib ):
+class Histo( ConfigMatplotlib, ConfigHist ):
     def __init__(self, bins=None, nbins=None, ranges=None, variable = None):
         self.variable = variable
         self.name   = variable["part"]+variable["var"]+variable["ph"]
@@ -39,6 +40,7 @@ class Histo( ConfigMatplotlib ):
                 self.nbins = len(bins)
                 self.ranges = [bins[0],bins[-1]]
                 self.values = [0]*(len(self.bins)-1)
+        
     
     def __repr__(self):              
         msg= "Histo(bins="+str(self.bins)+",\n"              "      nbins="+str(self.nbins)+",\n"              "      ranges="+str(self.ranges)+")"
@@ -48,6 +50,22 @@ class Histo( ConfigMatplotlib ):
     def __str__(self):
         msg= "Histo(bins="+str(self.bins)+",\n"              "      nbins="+str(self.nbins)+",\n"              "      ranges="+str(self.ranges)+")"
         return msg    
+    
+    def __add__(self,other):
+        #if other.bins != self.bins:
+        #    raise BaseException("bins must match")
+        histo = Histo(self.bins, self.nbins,self.ranges, self.variable)
+        histo.values = list(np.array(self.values) + np.array(other.values))
+    
+        return histo
+    
+    def __radd__(self,other):
+        #if other.bins != self.bins:
+        #    raise BaseException("bins must match")
+        histo = Histo(self.bins,self.nbins,self.ranges,self.variable)
+        histo.values = list(np.array(self.values) + np.array(other.values))
+    
+        return histo
     
     def _getRanges(self,part,var,ph):
         rangefile = self.confpath + "ranges.csv"
@@ -66,8 +84,8 @@ class Histo( ConfigMatplotlib ):
     
     def setup(self,bins=None,ranges=None,nbins=None):
         self.ranges = ranges
-        self.nbins = nbins
-        self.bins = bins
+        self.nbins  = nbins
+        self.bins   = bins
         self.values = [0]*(len(self.bins)-1)
     
     def TotalEntries(self):
@@ -95,13 +113,15 @@ class Histo( ConfigMatplotlib ):
     def plot(self,log=False,Type="Single"):
         
         super(Histo,self).setRC(plt.rc,Type=Type)
+        binc = CommonHelper.Plot.BinFormat(Bins=self.bins, Type="center")
         
         plt.figure()
-        plt.errorbar(self.bins[:-1],
-                     self.values,
-                     xerr = np.diff(self.bins),
-                     linestyle=None,
-                    )
-        plt.show()
+        prop = super(Histo,self).getProperties()
+        plt.hist(binc,
+                 weights = self.values,
+                 **prop,
+                )
+        plt.legend()
+        #plt.show()
         
 

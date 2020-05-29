@@ -11,7 +11,7 @@ import scipy.special as spc
 from functools import wraps
 
 
-# In[15]:
+# In[2]:
 
 
 class CommonHelper:
@@ -40,6 +40,27 @@ class CommonHelper:
                 return result
             return wrapper
         
+    class Type:
+        @staticmethod
+        def isNumeric(num):
+            try: float(num)
+            except: return False
+            else: return True
+        
+        @staticmethod
+        def isIterable(ite):
+            try: iter(num)
+            except:return False
+            else: return True
+    
+    
+        @staticmethod
+        def isListOrArray(larr):
+            if larr is list or larr is np.ndarray:
+                return True
+            else:
+                return False
+            
     class Read:
         @staticmethod
         def openJson(file):

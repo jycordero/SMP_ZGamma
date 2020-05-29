@@ -15,8 +15,10 @@ from Common.StackList import StackList
 
 
 class HistoVar( StackList ):
-    def __init__(self,variable=None,stack = None):
+    def __init__(self,variable=None,stack = None,Print=False):
         StackList.__init__(self, stack )
+        self.Print = Print
+        
         self.defaultvar = {
                             "part":"",
                             "var" :"",
@@ -42,12 +44,53 @@ class HistoVar( StackList ):
             self.__addVariable(variable)
         else:
             self.variable = variable
-
+            
+    def __add__(self,other):
+        if self.variable != other.variable:
+            raise BaseException("Variable stack must have the same variables (in the same order)")
+        #histoVar = HistoVar(Print=self.Print)
+        #for ise, iot in zip(self,other):
+        #    if self.Print: (ise+iot).values
+        #    histoVar.append(ise+iot)
+        histoVar = HistoVar(variable=self.vardict, stack = self.stack, Print=self.Print)
+        for ih, iot in zip(histoVar,other):
+            if self.Print: (ih+iot).values
+            ih.values = (ih+iot).values
+            #ih.values = list(np.array(ih.values) + np.array(iot.values))
+            
+        return histoVar
+    
+    def __radd__(self,other):
+        if self.variable != other.variable:
+            raise BaseException("Variable stack must have the same variables (in the same order)")
+        histoVar = HistoVar(variable=self.vardict, stack = self.stack, Print=self.Print)
+        for ih, iot in zip(histoVar,other):
+            if self.Print: (ih+iot).values
+            ih.values = (ih+iot).values
+            #ih.values = list(np.array(ih.values) + np.array(iot.values))
+            
+        return histoVar
+    
+    def __iadd__(self,other):
+        if self.variable != other.variable:
+            raise BaseException("Variable stack must have the same variables (in the same order)")
+        #histoVar = HistoVar(Print=self.Print)
+        #for ise, iot in zip(self,other):
+        #    if self.Print: (ise+iot).values
+        #    histoVar.append(ise+iot)
+        histoVar = HistoVar(variable=self.vardict, stack = self.stack, Print=self.Print)
+        for ih, iot in zip(histoVar,other):
+            if self.Print: (ih+iot).values
+            ih.values = (ih+iot).values
+            #ih.values = list(np.array(ih.values) + np.array(iot.values))
+            
+        return histoVar    
+    
     def __addVariable(self,variable):
         if self.variable is None:
-            self.vardict = []
+            self.vardict  = []
             self.variable = []
-            self.name = []
+            self.name     = []
         
         if variable is not None:
             if type(variable) is list:
@@ -72,7 +115,12 @@ class HistoVar( StackList ):
             
         ranges = self._getRanges(stack.variable)
         bins = self._getBins(stack.variable)
-        
+        if CommonHelper.Type.isNumeric(bins):
+            bins = np.array(CommonHelper.Plot.BinFormat(Bins=bins,ranges=ranges,Type='edges'))
+        elif np.isnan(bins).any():
+                raise BaseException("Nan bin")
+
+        #print(ranges,bins)
         stack.setup(bins=bins,ranges=ranges)
         
         self.vappend(stack)
@@ -80,14 +128,7 @@ class HistoVar( StackList ):
     def vappend(self,stack):
         super().append(stack)
         self.__addVariable(stack.variable)
-        
-            
-    def getPartVarPh(self,variable):
-        part,var,ph = "photonOne","Pt","_EE"
-        return part,var,ph
-    
-
-    
+           
     def _getRanges(self,variable,part=None,var=None,ph=None):
         if variable is not None:
             part,var,ph = variable["part"],variable["var"],variable["ph"]

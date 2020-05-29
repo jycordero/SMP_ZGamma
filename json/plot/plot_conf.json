@@ -1,4 +1,20 @@
 {
+
+	"":{ 
+			"plot":{
+				"color":"r",
+				"linewidth":"none",
+				"marker":"o"
+			},
+			"hist":{
+				"color":"r",
+				"histtype":"stepfilled"
+			},
+			"color":"r",
+			"data":false,
+			"signal":false,
+			"label":"default"
+	},
 	"test":{ 
 			"plot":{
 				"color":"r",

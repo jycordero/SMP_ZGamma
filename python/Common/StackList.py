@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 class StackList:
@@ -40,7 +40,13 @@ class StackList:
     
     def __iter__(self):
         return iter(self.stack)
-        
+    
+    def remove(self,i):
+        self.stack.remove(i)
+    
+    def pop(self,i):
+        return self.stack.pop(i)
+    
     def append(self,istack):
         if self.stack:
             self.stack.append(istack)
