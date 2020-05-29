@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[2]:
@@ -1879,32 +1879,8 @@ import array
 from ROOT import TFile
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[5]:
 
 
 m = [1,2,3,4,5,6,7]
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[1]:
@@ -14,12 +14,6 @@ from Plotter.Helper    import Helper
 
 import Samples
 import Plotter
-
-
-# In[ ]:
-
-
-
 
 
 # In[11]:
@@ -249,12 +243,6 @@ def SF_ratio(
     return puWeight
 
 
-# In[ ]:
-
-
-
-
-
 # In[13]:
 
 
@@ -328,12 +316,6 @@ for d in data:
     MC[d.name] = h[0] 
     M[d.name] = h
 plt.legend()
-
-
-# In[ ]:
-
-
-
 
 
 # In[20]:
@@ -485,16 +467,4 @@ graph.Draw()
 
 
 graph.Eval(50)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

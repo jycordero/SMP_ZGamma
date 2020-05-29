@@ -1,0 +1,64 @@
+{
+        "Test"      :1,
+        "Muon"      :1,
+        "DoubleMuon":1,
+        "DoubleMuon_2016A":1,
+        "DoubleMuon_2016B":1,
+        "DoubleMuon_2016C":1,
+        "DoubleMuon_2016D":1,
+        "DoubleMuon_2016E":1,
+        "DoubleMuon_2016F":1,
+        "DoubleMuon_2016G":1,
+        "DoubleMuon_2016H":1,
+        "DoubleMuon_2017A":1,
+        "DoubleMuon_2017B":1,
+        "DoubleMuon_2017C":1,
+        "DoubleMuon_2017D":1,
+        "DoubleMuon_2017E":1,
+        "DoubleMuon_2017F":1,
+        "DoubleMuon_2018A":1,
+        "DoubleMuon_2018B":1,
+        "DoubleMuon_2018C":1,
+        "DoubleMuon_2018D":1,
+
+	"ZG_ZToLL" : {
+			"2016":47.34
+	},
+        "ZGToLLG"  : {
+			"2016":47.34,
+			"2017":117.864,
+			"2018":117.864
+	},
+
+        "DYJets"      : 6077.22,
+        
+        "ZZTo2L2Q"    : 3.22,
+        "ZZTo2L2Nu"   : 0.564,
+        "ZZTo4L"      : 1.212,       
+        
+        "WWTo2L2Nu"   : 12.178,
+        "WWToLNuQQ"   : 49.997,
+        
+        "WZ"          : 0.8594,
+        "WZTo2L2Q"    : 5.595,
+        "WZTo1L1Nu2Q" : 10.71,
+        "WZTo3LNu"    : 4.42965,
+        "WZTo1L3Nu"   : 3.033,
+        
+        "ggF"         : 43.62, 
+        "VBF"         : 3.727,  
+        
+        "WJets"       : 61526.7,
+        "W1Jets"      : 9493.0,
+        "W2Jets"      : 3120.0,
+        "W3Jets"      : 942.3,
+        "W4Jets"      : 524.1,
+        
+        "W1JetsToLNu" : 9493.0,
+        "W2JetsToLNu" : 3120.0,
+        "W3JetsToLNu" : 942.3,
+        "W4JetsToLNu" : 524.1,
+
+        "TT"          : 831.76,
+        "TTTo2L2Nu"   : 87.31
+}

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[ ]:
@@ -10,7 +10,7 @@ import numpy as np
 # In[1]:
 
 
-class Stack():
+class StackDict():
     def __init__(self, data = []):
         self.stack = {}
         

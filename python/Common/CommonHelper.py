@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[9]:
@@ -45,12 +45,9 @@ class CommonHelper:
         def openJson(file):
             import json
             with open(file) as f:
-                JS = f.read()
+                JSON = f.read()
             return json.loads(JSON)
-                
-            
-                
-            
+                            
     class Format:
         @staticmethod
         def ConvertString2Float(varS):
@@ -247,10 +244,4 @@ class CommonHelper:
                 indices.append(np.sum(CDF < samp))
             hist = np.histogram(dist[1][indices],bins=np.arange(-1,1.1,step=0.1))
             return np.array(hist[0])
-
-
-# In[ ]:
-
-
-
 

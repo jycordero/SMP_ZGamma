@@ -6,9 +6,10 @@ if [ -z $MODE ]; then
 	echo "Speficy  operation(remote, locally)"
 	echo "--- If remote, specify port otherwise port=8889"
 	printf "\n\n"
-elif [ -z $PORT ] ; then 
-	$PORT=8889
 else
+	if [ -z $PORT ] ; then 
+		PORT=8889
+	fi
 	source activate CMSenv
 	source setup.sh
 

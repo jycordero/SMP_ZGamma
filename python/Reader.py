@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[ ]:
@@ -80,6 +80,8 @@ class Reader():
     def rootReadMC(self,sample):
         postName = "_v"
         
+        # sample can be a list and this is intrepreted as several sample
+        # merged insto one. Ex. WWTo2L2Nu, ZZTo4L -> VV (Diboson samples)
         if type(sample) == list:
             if len(sample) > 1:
                 datas = []
@@ -184,10 +186,4 @@ class Reader():
                 print("Property \"Type\" is needs to be \"join\" or \"array\".")
 
         return data
-
-
-# In[ ]:
-
-
-
 

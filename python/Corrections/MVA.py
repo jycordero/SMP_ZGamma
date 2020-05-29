@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[ ]:
@@ -68,16 +68,4 @@ class MVA():
 
                     self.BDT[ph][d.name].append(self.reader[ph].EvaluateMVA("BDT"))
         
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
