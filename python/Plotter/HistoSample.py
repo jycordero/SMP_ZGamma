@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[3]:
@@ -6,6 +6,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+
 from Plotter.ConfigHist import ConfigHist
 from Plotter.ConfigMatplotlib import ConfigMatplotlib
 from Common.CommonHelper import CommonHelper
@@ -15,7 +16,7 @@ from Common.StackList import StackList
 # In[4]:
 
 
-class HistoSample( StackList, ConfigHist, ConfigMatplotlib ):
+class HistoSample( StackList, ConfigMatplotlib, ConfigHist ):
     def __init__(self,name=None,stack = None,Print=False):
         StackList.__init__(self, stack)
         self.Print = Print
@@ -52,6 +53,23 @@ class HistoSample( StackList, ConfigHist, ConfigMatplotlib ):
                 self.name  += name
             else:
                 self.name  += [ name ]
+                
+    def getEntries(self):
+        return [ len(ist) for ist in self ]
+    
+    def _order(self,Type="l2m"):
+        entries = self.getEntries()
+        ind = np.argsort(entries)
+        if Type == "l2m":
+            self.name = list(np.array(self.name)[ind])
+            self.stack = self[ind]
+        elif Type == "m2l":
+            ind = ind[::-1]
+            self.name = list(np.array(self.name)[ind])
+            #self.stack = self.stack[ind]
+            self.stack = self[ind]
+        else:
+            print("Type of ordering is not supported")
     
     def Name2Index(self,sample):
         index = np.arange(len(self))
@@ -66,20 +84,17 @@ class HistoSample( StackList, ConfigHist, ConfigMatplotlib ):
         return prop
     
     def pop(self,i):
-        super().pop(i)
         self.name.pop(i)
+        return super().pop(i)
         
     def merge(self,samples,name=None):
         if name is None:
             raise BaseException("Provide a name for the merged sample")
         
-        for i ,smp in enumerate(samples):
-            if i == 0: histos = self.pop(self.Name2Index(smp))
-            else: histos += self.pop(self.Name2Index(smp))
-        #self.append(sum([self.pop(self.Name2Index(smp)) for smp in samples]),name)
-        self.append(histo,name)
+        self.append(sum([self.pop(self.Name2Index(smp)) for smp in samples]),name)
+
     
-    def plot(self,variable="photonOnePt",log=False,Type = "Single"):
+    def plot(self,variable,log=False,Type = "Single",Debug=False):
         
         super(HistoSample,self).setRC(plt.rc,Type=Type)
         
@@ -101,5 +116,14 @@ class HistoSample( StackList, ConfigHist, ConfigMatplotlib ):
         ax = plt.gca()
         if log:
             ax.set_yscale('log')
-        return fig,ax
+        if Debug:
+            return fig,ax,binc,value,prop,
+        else:
+            return fig,ax
+
+
+# In[ ]:
+
+
+
 

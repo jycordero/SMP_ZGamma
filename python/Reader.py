@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[ ]:
@@ -186,4 +186,10 @@ class Reader():
                 print("Property \"Type\" is needs to be \"join\" or \"array\".")
 
         return data
+
+
+# In[ ]:
+
+
+
 

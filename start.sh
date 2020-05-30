@@ -10,7 +10,8 @@ else
 	if [ -z $PORT ] ; then 
 		PORT=8889
 	fi
-	source activate CMSenv
+	#source activate CMSenv
+	conda activate envSMP
 	source setup.sh
 
 	if [ "$MODE" = "remote" ]; then

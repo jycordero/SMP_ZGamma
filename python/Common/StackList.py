@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[1]:
@@ -27,13 +27,19 @@ class StackList:
             key = int(key)
             return self.stack[key]
         except:
-            try:
-                for istack in self.stack:
-                    if istack.name.lower() == key.lower():
-                        return istack
-                return None
-            except:
-                raise BaseException("Stack elements does not have \"name\" member. Use int index")
+            if type(key) is str:
+                try:
+                    for istack in self.stack:
+                        if istack.name.lower() == key.lower():
+                            return istack
+                    return None
+                except:
+                    raise BaseException("Stack elements does not have \"name\" member. Use int index")
+            else:
+                try:
+                    return [ self[k] for k in key ]
+                except:
+                    raise BaseException("Type of key is not supported")
         
     def __len__(self):
         return len(self.stack)

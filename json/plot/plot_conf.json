@@ -435,5 +435,20 @@
 			"data":false,
 			"signal":false,
 			"label":"ZZTo4L"
+	},
+	"VV":{
+			"plot":{
+				"color":"lightskyblue",
+				"linewidth":"none",
+				"marker":"o"
+			},
+			"hist":{
+				"color":"lightskyblue",
+				"histtype":"stepfilled"
+			},
+			"color":"lightskyblue",
+			"data":false,
+			"signal":false,
+			"label":"VV"
 	}
 }

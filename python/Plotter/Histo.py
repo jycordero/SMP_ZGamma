@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[2]:
@@ -24,6 +24,7 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         self.nbins  = nbins
         self.ranges = ranges
         self.bins   = bins #bins most be in list/array format
+        self.entries = 0
         
         if self.bins is None:
             if self.nbins:
@@ -49,23 +50,25 @@ class Histo( ConfigMatplotlib, ConfigHist ):
        
     def __str__(self):
         msg= "Histo(bins="+str(self.bins)+",\n"              "      nbins="+str(self.nbins)+",\n"              "      ranges="+str(self.ranges)+")"
-        return msg    
+        return msg  
+
+    def __len__(self):
+        return np.sum(self.values)
     
     def __add__(self,other):
         #if other.bins != self.bins:
         #    raise BaseException("bins must match")
         histo = Histo(self.bins, self.nbins,self.ranges, self.variable)
+        histo.entries = self.entries + other.entries
         histo.values = list(np.array(self.values) + np.array(other.values))
-    
+        
         return histo
     
     def __radd__(self,other):
-        #if other.bins != self.bins:
-        #    raise BaseException("bins must match")
-        histo = Histo(self.bins,self.nbins,self.ranges,self.variable)
-        histo.values = list(np.array(self.values) + np.array(other.values))
-    
-        return histo
+        if other == 0:
+            return self
+        else:
+            return self.__add__(other)
     
     def _getRanges(self,part,var,ph):
         rangefile = self.confpath + "ranges.csv"
@@ -88,8 +91,11 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         self.bins   = bins
         self.values = [0]*(len(self.bins)-1)
     
-    def TotalEntries(self):
-        return np.sum(self.values)
+    def TotalEntries(self,weighted=False):
+        if weighted:
+            return len(self)
+        else:
+            return self.entries
 
     
     def _OutOfRangeClean(self,array, indarray=None):
@@ -97,18 +103,18 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         arrays = np.array(array)
         return arrays[np.logical_and(indarray >= self.bins[0], indarray <= self.bins[-1])]
     
-    def _getBinCount(self,i,values,weight):
-        return np.sum(weight[np.logical_and(values > self.bins[i], values <= self.bins[i+1])])
+    def _getBinCount(self,i,dfvalues,weight):
+        return np.sum(weight[np.logical_and(dfvalues > self.bins[i], dfvalues <= self.bins[i+1])])
         
     
-    def fill(self,values,weight=None):
-        if weight is None: weight = [1]*len(values)
-        
-        weight = self._OutOfRangeClean(weight,values) #weight must be done first
-        values = self._OutOfRangeClean(values)
+    def fill(self,dfvalues,weight=None):
+        if weight is None: weight = [1]*len(dfvalues)
+        self.entries += len(dfvalues)
+        weight = self._OutOfRangeClean(weight,dfvalues) #weight must be done first
+        dfvalues = self._OutOfRangeClean(dfvalues)
              
         for i in range(len(self.bins)-1):
-            self.values[i] += self._getBinCount(i,values,weight)
+            self.values[i] += self._getBinCount(i,dfvalues,weight)
             
     def plot(self,log=False,Type="Single"):
         

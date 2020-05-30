@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[ ]:
@@ -16,4 +16,10 @@ class DataStack( StackList ):
                    
     def getSamples(self):
         return [stk.name for stk in self.stack]
+
+
+# In[ ]:
+
+
+
 

@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[ ]:
@@ -1586,4 +1586,22 @@ class Helper( CommonHelper ):
                     #print(str(etai),str(varj),np.sum(hist[str(etai)][str(varj)][0]))
         return hist,Bins
         
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 

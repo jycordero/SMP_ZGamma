@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[3]:
@@ -6,7 +6,10 @@
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
 from Plotter.ConfigHist import ConfigHist
+from Plotter.ConfigMatplotlib import ConfigMatplotlib
 from Common.CommonHelper import CommonHelper
 from Common.StackList import StackList
 
@@ -14,7 +17,7 @@ from Common.StackList import StackList
 # In[4]:
 
 
-class HistoVar( StackList ):
+class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
     def __init__(self,variable=None,stack = None,Print=False):
         StackList.__init__(self, stack )
         self.Print = Print
@@ -46,45 +49,28 @@ class HistoVar( StackList ):
             self.variable = variable
             
     def __add__(self,other):
+        print(self.variable," ",other.variable)
         if self.variable != other.variable:
             raise BaseException("Variable stack must have the same variables (in the same order)")
-        #histoVar = HistoVar(Print=self.Print)
-        #for ise, iot in zip(self,other):
-        #    if self.Print: (ise+iot).values
-        #    histoVar.append(ise+iot)
-        histoVar = HistoVar(variable=self.vardict, stack = self.stack, Print=self.Print)
-        for ih, iot in zip(histoVar,other):
-            if self.Print: (ih+iot).values
-            ih.values = (ih+iot).values
-            #ih.values = list(np.array(ih.values) + np.array(iot.values))
+            
+        histoVar = HistoVar(Print=self.Print)
+        for ise, iot in zip(self,other):
+            if self.Print: (ise+iot).values
+            histoVar.append(ise+iot)
             
         return histoVar
     
     def __radd__(self,other):
-        if self.variable != other.variable:
-            raise BaseException("Variable stack must have the same variables (in the same order)")
-        histoVar = HistoVar(variable=self.vardict, stack = self.stack, Print=self.Print)
-        for ih, iot in zip(histoVar,other):
-            if self.Print: (ih+iot).values
-            ih.values = (ih+iot).values
-            #ih.values = list(np.array(ih.values) + np.array(iot.values))
-            
-        return histoVar
-    
-    def __iadd__(self,other):
-        if self.variable != other.variable:
-            raise BaseException("Variable stack must have the same variables (in the same order)")
-        #histoVar = HistoVar(Print=self.Print)
-        #for ise, iot in zip(self,other):
-        #    if self.Print: (ise+iot).values
-        #    histoVar.append(ise+iot)
-        histoVar = HistoVar(variable=self.vardict, stack = self.stack, Print=self.Print)
-        for ih, iot in zip(histoVar,other):
-            if self.Print: (ih+iot).values
-            ih.values = (ih+iot).values
-            #ih.values = list(np.array(ih.values) + np.array(iot.values))
-            
-        return histoVar    
+        if other == 0:
+            return self
+        else:
+            return self.__add__(other)
+
+    def __len__(self):
+        if self.stack is None:            
+            raise BaseException()
+
+        return self[0].TotalEntries()
     
     def __addVariable(self,variable):
         if self.variable is None:
@@ -118,7 +104,7 @@ class HistoVar( StackList ):
         if CommonHelper.Type.isNumeric(bins):
             bins = np.array(CommonHelper.Plot.BinFormat(Bins=bins,ranges=ranges,Type='edges'))
         elif np.isnan(bins).any():
-                raise BaseException("Nan bin")
+                raise BaseException("NaN bin")
 
         #print(ranges,bins)
         stack.setup(bins=bins,ranges=ranges)
@@ -150,5 +136,34 @@ class HistoVar( StackList ):
         #bins = np.array(CommonHelper.Plot.BinFormat(Bins=bins,ranges=ranges,Type='edges'))
         return bins
     
+    def plot(self,variable,log=False,Type = "Single"):
+        
+        super(HistoVar,self).setRC(plt.rc,Type=Type)
+        
+        fig = plt.figure()       
+        
+        value = self[variable].values 
+        bins = self[variable].bins
+        binc = CommonHelper.Plot.BinFormat(Bins=bins, Type="center")
+        
+        prop = self.getProperties()
+        plt.hist(binc,
+                 weights  = value,
+                 **prop,
+                 )
+        
+        plt.legend()
+        
+        ax = plt.gca()
+        if log:
+            ax.set_yscale('log')
+        return fig,ax
     
+    
+
+
+# In[ ]:
+
+
+
 
