@@ -28,6 +28,18 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist ):
             else:
                 self.name     = [ self.name ]
     
+    def size(self,sample=None,variable=None,weighted=True):
+        if sample is None:
+            return len(self)
+        else:
+            try:
+                return self[sample].size(variable,weighted)
+            except:
+                return self[sample].size(weighted)
+            
+    def sizes(self,variable = None, weighted=True): 
+        return [ ist.size(variable,weighted) for ist in self ]
+    
     def append(self,stack,name=None):
         if name is None and stack.name is None:
             raise "Name is not specified, provide argument \"name\" or set is in Histo"
@@ -55,21 +67,24 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist ):
                 self.name  += [ name ]
                 
     def getEntries(self):
-        return [ len(ist) for ist in self ]
+        return self.sizes(weighted=False)
     
-    def _order(self,Type="l2m"):
-        entries = self.getEntries()
-        ind = np.argsort(entries)
-        if Type == "l2m":
-            self.name = list(np.array(self.name)[ind])
-            self.stack = self[ind]
-        elif Type == "m2l":
-            ind = ind[::-1]
-            self.name = list(np.array(self.name)[ind])
-            #self.stack = self.stack[ind]
-            self.stack = self[ind]
+    def _setOrder(self,ind):
+        self.name = list(np.array(self.name)[ind])
+        self.stack = self[ind]
+    
+    def _order(self,order="l2m",weighted=True,ind=None):
+        if ind is None:
+            entries = self.sizes()
+            ind = np.argsort(entries)
+            if order == "l2m":
+                self._setOrder(ind)
+            elif order == "m2l":
+                self._setOrder(ind[::-1])
+            else:
+                print("Type of ordering is not supported")
         else:
-            print("Type of ordering is not supported")
+            self._setOrder(ind)
     
     def Name2Index(self,sample):
         index = np.arange(len(self))
@@ -92,13 +107,15 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist ):
             raise BaseException("Provide a name for the merged sample")
         
         self.append(sum([self.pop(self.Name2Index(smp)) for smp in samples]),name)
+        
 
     
-    def plot(self,variable,log=False,Type = "Single",Debug=False):
-        
+    def plot(self,variable,log=False,Type = "Single",Debug=False,order="l2m",ind=None):
         super(HistoSample,self).setRC(plt.rc,Type=Type)
         
         fig = plt.figure()       
+        
+        self._order(order,ind)
         
         value = [histo[variable].values for histo in self.stack]
         bins = self.stack[0][variable].bins
@@ -111,9 +128,11 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist ):
                  **prop,
                  )
         
-        plt.legend()
-        
         ax = plt.gca()
+        ax.legend()
+        ax.set_ylabel('Counts')
+        ax.set_xlabel(variable)
+        
         if log:
             ax.set_yscale('log')
         if Debug:

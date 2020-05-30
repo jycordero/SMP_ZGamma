@@ -49,13 +49,11 @@ class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
             self.variable = variable
             
     def __add__(self,other):
-        print(self.variable," ",other.variable)
         if self.variable != other.variable:
             raise BaseException("Variable stack must have the same variables (in the same order)")
             
         histoVar = HistoVar(Print=self.Print)
         for ise, iot in zip(self,other):
-            if self.Print: (ise+iot).values
             histoVar.append(ise+iot)
             
         return histoVar
@@ -64,13 +62,8 @@ class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
         if other == 0:
             return self
         else:
-            return self.__add__(other)
-
-    def __len__(self):
-        if self.stack is None:            
-            raise BaseException()
-
-        return self[0].TotalEntries()
+            return self.__add__(other)  
+        
     
     def __addVariable(self,variable):
         if self.variable is None:
@@ -88,7 +81,12 @@ class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
                 self.variable += [ variable["part"]+variable["var"]+variable["ph"] ]
                 self.name     = self.variable
         
-
+    def size(self,variable=None,weighted=True):
+        if variable is None:
+            return self[0].size(weighted)
+        else:
+            return self[variable].size(weighted)
+            
     #Overwritting append from StackList
     def append(self,stack,variable=None):
         if variable is None and stack.variable is None:
@@ -106,7 +104,6 @@ class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
         elif np.isnan(bins).any():
                 raise BaseException("NaN bin")
 
-        #print(ranges,bins)
         stack.setup(bins=bins,ranges=ranges)
         
         self.vappend(stack)

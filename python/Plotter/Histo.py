@@ -24,6 +24,7 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         self.nbins  = nbins
         self.ranges = ranges
         self.bins   = bins #bins most be in list/array format
+        self.values = None
         self.entries = 0
         
         if self.bins is None:
@@ -53,7 +54,7 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         return msg  
 
     def __len__(self):
-        return np.sum(self.values)
+        return int(np.sum(self.values))
     
     def __add__(self,other):
         #if other.bins != self.bins:
@@ -89,14 +90,17 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         self.ranges = ranges
         self.nbins  = nbins
         self.bins   = bins
-        self.values = [0]*(len(self.bins)-1)
+        if self.values is None:
+            self.values = [0]*(len(self.bins)-1)
     
-    def TotalEntries(self,weighted=False):
+    def size(self,weighted=True):
         if weighted:
             return len(self)
         else:
             return self.entries
-
+    
+    def getEntries(self):
+        return self.size(weighted=False)
     
     def _OutOfRangeClean(self,array, indarray=None):
         if indarray is None: indarray = np.array(array)

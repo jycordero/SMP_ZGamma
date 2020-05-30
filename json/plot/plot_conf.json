@@ -436,7 +436,7 @@
 			"signal":false,
 			"label":"ZZTo4L"
 	},
-	"VV":{
+	"Diboson":{
 			"plot":{
 				"color":"lightskyblue",
 				"linewidth":"none",
@@ -449,6 +449,6 @@
 			"color":"lightskyblue",
 			"data":false,
 			"signal":false,
-			"label":"VV"
+			"label":"Diboson"
 	}
 }
