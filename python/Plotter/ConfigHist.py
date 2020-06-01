@@ -7,7 +7,7 @@
 from Common.CommonHelper import CommonHelper
 
 
-# In[ ]:
+# In[1]:
 
 
 class ConfigHist:
@@ -34,4 +34,57 @@ class ConfigHist:
     
     def getColor(self,name):
         return CommonHelper.Read.openJson(self.confpath+"plot_conf.json")[name]["color"]
+    
+    def Var2PlotDict(self,part,var,ph):
+        VarDict = []
+        dirstruc = {}
+        for p in part:
+            for v in var:
+                for gm in ph:
+                    VarDict.append({
+                                    "part":p,
+                                    "var":v,
+                                    "ph":gm
+                                    })
+
+        return VarDict
+    
+    def Var2Plot(self):
+        PartVar = []
+        VarDict = []
+
+        parts = ["photonOne","leptonOne","leptonTwo","dilepton","llg"]
+        var = ["Pt"]
+        ph = [""]
+        #ph = ["","_EE","_EB"]
+        PartVar += [p+v+gm for p in parts for v in var for gm in ph]
+        VarDict += self.Var2PlotDict(parts,var,ph)    
+
+        parts = ["dilepton","llg"]
+        var = ["M"]
+        ph = [""]
+        #ph = ["","_EE","_EB"]
+        PartVar += [p+v+gm for p in parts for v in var for gm in ph]
+        VarDict += self.Var2PlotDict(parts,var,ph)    
+
+        parts = ["photonOne","leptonOne","leptonTwo"]
+        var = ["Eta","Phi"]
+        ph = [""]
+        #ph = ["","_EE","_EB"]
+        PartVar += [p+v+gm for p in parts for v in var for gm in ph]
+        VarDict += self.Var2PlotDict(parts,var,ph)    
+
+        parts = ["dilepton","dileptonPhoton","l1Photon","l2Photon"]
+        var = ["DR","DEta","DPhi"]
+        ph = [""]
+        PartVar += [p+v+gm for p in parts for v in var for gm in ph]
+        VarDict += self.Var2PlotDict(parts,var,ph)
+
+        return PartVar,VarDict
+
+
+# In[ ]:
+
+
+
 

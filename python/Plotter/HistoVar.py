@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 from Plotter.ConfigHist import ConfigHist
 from Plotter.ConfigMatplotlib import ConfigMatplotlib
+from Plotter.Histo        import Histo
 from Common.CommonHelper import CommonHelper
 from Common.StackList import StackList
 
@@ -64,6 +65,26 @@ class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
         else:
             return self.__add__(other)  
         
+    def _getRanges(self,variable,part=None,var=None,ph=None):
+        if variable is not None:
+            part,var,ph = variable["part"],variable["var"],variable["ph"]
+
+        rangefile = self.confpath + "ranges.csv"
+        Range = pd.read_csv(rangefile)
+        ranges = Range.loc[Range['part'] == part+ph][var].values[0]
+        ranges = CommonHelper.Format.ConvertString2Float(ranges)    
+        return ranges
+    
+    def _getBins(self,variable,part=None,var=None,ph=None):
+        if variable is not None:
+            part,var,ph = variable["part"],variable["var"],variable["ph"]
+        
+        binfile = self.confpath + "bins.csv"
+        Bins = pd.read_csv(binfile)
+        bins = Bins.loc[Bins['part'] == part][var].values[0]
+        bins = CommonHelper.Format.ConvertString2Float(bins)
+        #bins = np.array(CommonHelper.Plot.BinFormat(Bins=bins,ranges=ranges,Type='edges'))
+        return bins  
     
     def __addVariable(self,variable):
         if self.variable is None:
@@ -80,7 +101,15 @@ class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
                 self.vardict  += [ variable ]
                 self.variable += [ variable["part"]+variable["var"]+variable["ph"] ]
                 self.name     = self.variable
-        
+    
+    def initialize(self):
+        HVarStack = HistoVar()
+        _,vardict = self.Var2Plot()
+    
+        for var in vardict:
+            HVarStack.append(Histo(variable = var))
+        return HVarStack
+    
     def size(self,variable=None,weighted=True):
         if variable is None:
             return self[0].size(weighted)
@@ -111,27 +140,10 @@ class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
     def vappend(self,stack):
         super().append(stack)
         self.__addVariable(stack.variable)
-           
-    def _getRanges(self,variable,part=None,var=None,ph=None):
-        if variable is not None:
-            part,var,ph = variable["part"],variable["var"],variable["ph"]
-
-        rangefile = self.confpath + "ranges.csv"
-        Range = pd.read_csv(rangefile)
-        ranges = Range.loc[Range['part'] == part+ph][var].values[0]
-        ranges = CommonHelper.Format.ConvertString2Float(ranges)    
-        return ranges
-    
-    def _getBins(self,variable,part=None,var=None,ph=None):
-        if variable is not None:
-            part,var,ph = variable["part"],variable["var"],variable["ph"]
         
-        binfile = self.confpath + "bins.csv"
-        Bins = pd.read_csv(binfile)
-        bins = Bins.loc[Bins['part'] == part][var].values[0]
-        bins = CommonHelper.Format.ConvertString2Float(bins)
-        #bins = np.array(CommonHelper.Plot.BinFormat(Bins=bins,ranges=ranges,Type='edges'))
-        return bins
+    def save(self,path,prefix=""):
+        for histo in self:
+            histo.save(path,prefix)
     
     def plot(self,variable,log=False,Type = "Single"):
         

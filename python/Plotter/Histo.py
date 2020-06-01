@@ -4,6 +4,7 @@
 # In[2]:
 
 
+import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,7 +14,7 @@ from Plotter.ConfigMatplotlib import ConfigMatplotlib
 from Common.CommonHelper import CommonHelper
 
 
-# In[ ]:
+# In[1]:
 
 
 class Histo( ConfigMatplotlib, ConfigHist ):
@@ -119,7 +120,12 @@ class Histo( ConfigMatplotlib, ConfigHist ):
              
         for i in range(len(self.bins)-1):
             self.values[i] += self._getBinCount(i,dfvalues,weight)
-            
+    
+    def save(self,path,prefix=""):
+        binc = CommonHelper.Plot.BinFormat(Bins=self.bins, Type="center")
+        df = pd.DataFrame.from_dict({'binc':binc,'values':self.values})
+        df.to_csv(path+prefix+self.name+".csv")
+    
     def plot(self,log=False,Type="Single"):
         
         super(Histo,self).setRC(plt.rc,Type=Type)
@@ -134,4 +140,10 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         plt.legend()
         #plt.show()
         
+
+
+# In[ ]:
+
+
+
 

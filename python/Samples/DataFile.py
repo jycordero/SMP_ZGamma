@@ -4,51 +4,76 @@
 # In[ ]:
 
 
-from ROOT import TFile
-from root_pandas import read_root
+from glob import glob
+import os
+import numpy as np
 
 
 # In[ ]:
 
 
-class DataFile:
-    def __init__(self,path, name, file,chunksize=1):
-        self.path = path
-        self.name = name
-        self.file = file
-        self.chunksize = chunksize
-        
-    def __repr__(self):              
-        return "file("+self.file+")"
-       
-    def __str__(self):
-        msg= "DataFile(path="+self.path+",\n"             "         name="+self.name+")"
-        return msg
+from Common.CommonHelper import CommonHelper
+from Common.StackList import StackList
+from Samples.Data import Data
+from Samples.ConfigData import ConfigData
 
-    def __len__(self):
-        return self.N()
-    
-    def __iter__(self):
-        return iter(read_root(self.path,chunksize=self.chunksize))
-    
-    def _totalNameToBin(name):
-        mapConv = {
-                "Total":1
-                    }
-        return mapConv[name]
+
+# In[ ]:
+
+
+class DataFile( StackList, ConfigData ):
+    def __init__(self,path,name,era,chunksize=1):
+        self.path = os.path.join(path, name) #/PATHTODATA/SAMPLE
+        self.name = name
+        self.era  = era
+        self.data = self.isData(name)
+        self.chunksize = chunksize
+        self.confpath = "/home/jcordero/CMS/SMP_ZGamma/json/data/"
         
-    def N(self,n=1):
-        rootFile = TFile(self.path)
-        return int(rootFile.Get("TotalEvents_"+self.name.lower()).GetBinContent(n))
-        
-    def Total(self):
-        return self.N()
+        StackList.__init__(self, self._loadFiles() )
     
-    def getBin(self,n):
+
+    def _loadFiles(self):
+        DataFiles = []
+        for files in self._getFiles():
+            filename = files.split("/")[-1]
+            DataFiles.append( Data(files, self.name, filename, self.chunksize) )
+        return DataFiles
+    
+    def _getFiles(self):
+        return glob(os.path.join(self.path,"output*[!v_0]*"))
+
+    def getLumi(self,era):
+        return CommonHelper.Read.openJson(self.confpath+"lumi.json")[era]
+    
+    def getXsec(self,process,era=None):
         try:
-            n = int(n)
+            return CommonHelper.Read.openJson(self.confpath+"xsec.json")[process][era]
         except:
-            n = self._totalNameToBin(n)
+            return CommonHelper.Read.openJson(self.confpath+"xsec.json")[process]
         
-        return self.N(n)
+    def getSF(self):
+        if(self.N() != 0 and not self.data):
+            return(1e3*self.getXsec(self.name,self.era)*self.getLumi(self.era)/self.N())
+        else: 
+            return(1)
+    
+    def N(self):
+        return np.sum([istck.N() for istck in self.stack])
+    
+    def Total(self):
+        return np.sum([istck.getTotal() for istck in self.stack])
+       
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 

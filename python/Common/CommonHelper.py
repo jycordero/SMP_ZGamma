@@ -154,7 +154,20 @@ class CommonHelper:
                 return np.logical_and(np.abs(Data) >= Low, np.abs(Data) <  Max)
             else:
                 return np.logical_and(np.array(Data) >= Low, np.array(Data) <  Max)   
-        
+    class Logic:
+        @staticmethod
+        def ABS(a):
+            return np.abs(a)
+        @staticmethod
+        def NOT(a):
+            return np.logical_not(a)
+        @staticmethod
+        def AND(a,b):
+            return np.logical_and(a,b)
+        @staticmethod
+        def OR(a,b):
+            return np.logical_or(a,b)
+    
     class Math:
         import numpy as np         
         

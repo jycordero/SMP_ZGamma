@@ -4,7 +4,7 @@ export PYTHONWORKDIR=/home/jcordero/CMS/SMP_ZGamma/python
 export PYTHONPATH=$PYTHONPATH:/home/jcordero/CMS/SMP_ZGamma/python
 
 TOPDIR=$PWD
-SUBDIRS=( Plotter  Samples Selections Efficiency Corrections Cuts Common )
+SUBDIRS=( Plotter  Samples Selections Efficiency Corrections Cuts Common Config )
 for DIR in ${SUBDIRS[@]} 
 do
 	jupyter nbconvert --to script *.ipynb
