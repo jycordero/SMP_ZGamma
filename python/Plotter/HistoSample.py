@@ -141,12 +141,18 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
 
         self.append(Merge,name)
         
-    def save(self,path,prefix=""):
+    def savehists(self,path,prefix=""):
         for i, histo in enumerate(self):
             histo.save(path,prefix+self.name[i])
 
     def savefig(self,fig,fullpath):
         fig.savefig(fullpath)
+        
+    def savefigs(self,path):
+        for var in self[0].variable:
+            for log in [True,False]:
+                fig, _ = self.plot(var,log=log)
+                self.savefig(fig, path+var)
         
             
     def plotDataMC(self,bins,Data,MC,ax=None):

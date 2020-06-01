@@ -4,6 +4,12 @@
 # In[ ]:
 
 
+import numpy as np 
+
+
+# In[ ]:
+
+
 def ABS(a):
     return np.abs(a)
 

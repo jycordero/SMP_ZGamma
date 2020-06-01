@@ -11,7 +11,7 @@ import scipy.special as spc
 from functools import wraps
 
 
-# In[2]:
+# In[4]:
 
 
 class CommonHelper:
@@ -137,7 +137,8 @@ class CommonHelper:
                         bins.append(Bins[-1][1])
                     bins = array.array("f",bins)
                 elif Type == 'center':
-                    if type(Bins[0]) is int or type(Bins[0]) is float or type(Bins[0]) is np.int64:
+                    #if type(Bins[0]) is int or type(Bins[0]) is float or type(Bins[0]) is np.int64:
+                    if CommonHelper.Type.isNumeric(Bins[0]):
                         bins = Bins
                     else:
                         for b in Bins:

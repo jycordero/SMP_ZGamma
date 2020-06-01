@@ -1,0 +1,23 @@
+{
+	"2018":{
+		"Runs":["A","B","C","D"],
+		"merger":{
+			"Diboson":["WZTo2L2Q","ZZTo4L","WZTo3LNu"],
+			"DoubleMuon":[]
+			}
+		},
+	"2017":{
+		"Runs":["B","C","D","E","F"],
+		"merger":{
+			"Diboson":["WWTo2L2Nu","WZTo2L2Q","WZTo3LNu","ZZTo2L2Nu","ZZTo2L2Q","ZZTo4L"],
+			"DoubleMuon":[]
+			}
+		},
+	"2016":{
+		"Runs":["B","C","D","E","F","G","H"],
+		"merger":{
+			"Diboson":["WWTo2L2Nu","WZTo2L2Q","WZTo3LNu","ZZTo2L2Nu","ZZTo2L2Q","ZZTo4L"],
+			"DoubleMuon":[]
+			}
+		}
+}

@@ -51,6 +51,7 @@ class Cuts:
             else: 
                 flag *= self._sameCharge(event)
             
+        flag *= self._extremeWeight(event)
         return flag
     
     
@@ -58,7 +59,8 @@ class Cuts:
         return getattr(self,"_"+region)
     
     
-    
+    def _extremeWeight(self,event):
+        return ABS(event.value('eventWeight')) < 1000
         
     def _vetoDY(self,event):
         return event.value('vetoDY') == False

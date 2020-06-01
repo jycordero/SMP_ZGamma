@@ -8,7 +8,7 @@ from Common import IO
 from Common.ProjectManage import ProjectManage
 
 
-# In[2]:
+# In[1]:
 
 
 class ConfigManager( ProjectManage ):
@@ -20,4 +20,9 @@ class ConfigManager( ProjectManage ):
     
     def CreateProject(self,path,date=True,Print=False):
         super().dirStructure(path,self._getDirStruct(),date,Print)
+        
+    def legacy(self,era):
+        if   '2016' in era : return 'legacy'
+        elif '2017' in era : return 'rereco'
+        elif '2018' in era : return 'rereco'
 
