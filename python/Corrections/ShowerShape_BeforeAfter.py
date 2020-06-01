@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[1]:
@@ -9,12 +9,6 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as col
 import numpy as np
 import pandas as pd
-
-
-# In[ ]:
-
-
-
 
 
 # In[2]:
@@ -40,22 +34,10 @@ from Helper import Helper
 import Plotter
 
 
-# In[ ]:
-
-
-
-
-
 # In[4]:
 
 
 import os, datetime
-
-
-# In[ ]:
-
-
-
 
 
 # In[5]:
@@ -186,12 +168,6 @@ LoadVars = [
             ]
 
 
-# In[ ]:
-
-
-
-
-
 # In[7]:
 
 
@@ -239,18 +215,6 @@ elif selection == "ee":
 DYJets     = Data(path +      "DYJets/",     "DYJets", "_v", era = '2017', var = LoadVars)
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[10]:
 
 
@@ -292,30 +256,6 @@ if selection == "ee" or selection == "mumu":
         W3Jets = Data(path + "W2JetsToLNu/","W3JetsToLNu", trigger, era = era, var = LoadVars)
         W4Jets = Data(path + "W3JetsToLNu/","W4JetsToLNu", trigger, era = era, var = LoadVars)
 ''';
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[11]:
@@ -437,30 +377,6 @@ showershapeVar = [
    ]
 
 #showershapeVar = ['photonOne'+v for v in showershapeVar]
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[13]:
@@ -671,12 +587,6 @@ def SF_ratio(
             puW[mask] = np.ones(np.sum(mask))*rScale[i]
         puWeight.append(puW)
     return puWeight
-
-
-# In[ ]:
-
-
-
 
 
 # In[17]:
@@ -900,12 +810,6 @@ def GET_WeiVAR(data,Ks,weightCorrection = True):
     VAR = [d.GetWithCuts(part+var+ph) for d in data]        
         
     return wei,VAR
-
-
-# In[ ]:
-
-
-
 
 
 # In[22]:
@@ -1272,12 +1176,6 @@ def Plot_Mult(
     fig.savefig(figpath+stackFol+'/Mult/'+var+stackLab+".png")
 
 
-# In[ ]:
-
-
-
-
-
 # In[26]:
 
 
@@ -1402,42 +1300,6 @@ def PhaseSpace(
                                       np.array(d.df.photonOneIch_EE) >= 1.5 
                                      )
                 d.AddCuts(SideBandRegion)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[27]:
@@ -1662,96 +1524,6 @@ for log in [True,False]:
                         )
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[36]:
 
 
@@ -1871,30 +1643,6 @@ for gm in ['EE','EB']:
 
 
 #np.sum(np.array(xs['Sieip_EB']) > 1)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -2035,35 +1783,5 @@ for gm in ['EE','EB']:
 # In[ ]:
 
 
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
 figpath+"trans_ShowerShape_"+v+"_"+gm+".root"
-
-
-# In[ ]:
-
-
-
 

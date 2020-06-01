@@ -11,8 +11,8 @@ else
 		PORT=8889
 	fi
 	#source activate CMSenv
-	conda activate envSMP
-	source setup.sh
+	conda activate envSMP/
+	source . python/setup.sh
 
 	if [ "$MODE" = "remote" ]; then
 		echo "--Running remote operation at port 8889"

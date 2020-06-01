@@ -1,9 +1,7 @@
 #bin/bash!
 
-export PARENTWORKDIR=/home/jcordero/CMS/JYCMCMS/SMP_ZG/python
-export PYTHONPATH=$PYTHONPATH:/home/jcordero/CMS/JYCMCMS/SMP_ZG/python
 
-TOPDIR=$PARENTWORKDIR
+TOPDIR=/home/jcordero/CMS/SMP_ZGamma/python
 SUBDIRS=( Plotter  Samples Corrections)
 for DIR in ${SUBDIRS[@]} 
 do

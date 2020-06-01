@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[1]:
@@ -126,9 +126,11 @@ class Data(object):
                 try:
                     for attr in self.df.columns:
                         self.df[attr+'_EE'] = self.df[attr][np.abs(self.df.photonOneEta) > 1.48 ]
+                        self.df[attr+'_EE'] = [None]*len(self.df[attr][np.abs(self.df.photonOneEta) <= 1.48 ])
 
                     for attr in self.df.columns:
                         self.df[attr+'_EB'] = self.df[attr][np.abs(self.df.photonOneEta) <= 1.48 ]
+                        self.df[attr+'_EB'] = [None]*len(self.df[attr][np.abs(self.df.photonOneEta) > 1.48 ])
                 except:
                     err = sys.exc_info()[0]
                     print( "<p>Error: %s</p>" % err )
@@ -437,28 +439,4 @@ class Topology(object):
         else: 
             return(1)
         
-
-
-# In[13]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

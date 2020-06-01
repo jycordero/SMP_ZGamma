@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[11]:
@@ -117,26 +117,8 @@ plt.show()
 hist.keys()
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[19]:
 
 
 #hist["full5x5R9"]
-
-
-# In[ ]:
-
-
-
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[2]:
@@ -948,7 +948,7 @@ class Helper():
         elif era == "2018":
             DataGen = "rereco"
             
-        file = TFile('/home/jcordero/CMS/data_'+era+'/'+DataGen+'/SMP_ZG/Files/'+pileupFile)
+        file = TFile('/home/jcordero/CMS/data/data_'+era+'/'+DataGen+'/SMP_ZG/Files/'+pileupFile)
         puTree = file.Get('pileup')
         PUdata = []
         for pu in puTree:
@@ -1408,7 +1408,7 @@ class Helper():
                 ranges = self.plotOpsAll[0]['range'][var][part+ph]
                 bins   = self.plotOpsAll[0]['bins'][var][part+ph]
         else:
-            path = "/home/jcordero/CMS/JYCMCMS/SMP_ZG/python/Plotter/"
+            path = "/home/jcordero/CMS/SMP_ZGamma/python/Plotter/"
             Range = pd.read_csv(path+"ranges.csv")
             Bins  = pd.read_csv(path+"bins.csv")
             
@@ -1879,32 +1879,8 @@ import array
 from ROOT import TFile
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[5]:
 
 
 m = [1,2,3,4,5,6,7]
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

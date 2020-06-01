@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[1]:
@@ -10,12 +10,6 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as col
 import numpy as np
 import pandas as pd
-
-
-# In[ ]:
-
-
-
 
 
 # In[2]:
@@ -41,22 +35,10 @@ from Helper import Helper
 import Plotter
 
 
-# In[ ]:
-
-
-
-
-
 # In[4]:
 
 
 import os, datetime
-
-
-# In[ ]:
-
-
-
 
 
 # In[5]:
@@ -244,48 +226,6 @@ elif selection == "ee":
 DYJets     = Data(path +      "DYJets/",     "DYJets", "_v", era = '2017', var = LoadVars)
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[11]:
 
 
@@ -405,30 +345,6 @@ showershapeVar = [
    ]
 
 #showershapeVar = ['photonOne'+v for v in showershapeVar]
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[13]:
@@ -639,12 +555,6 @@ def SF_ratio(
             puW[mask] = np.ones(np.sum(mask))*rScale[i]
         puWeight.append(puW)
     return puWeight
-
-
-# In[ ]:
-
-
-
 
 
 # In[17]:
@@ -870,12 +780,6 @@ def GET_WeiVAR(data,Ks,weightCorrection = True):
     VAR = [d.GetWithCuts(part+var+ph) for d in data]        
         
     return wei,VAR
-
-
-# In[ ]:
-
-
-
 
 
 # In[22]:
@@ -1242,12 +1146,6 @@ def Plot_Mult(
     fig.savefig(figpath+stackFol+'/Mult/'+var+stackLab+".png")
 
 
-# In[ ]:
-
-
-
-
-
 # In[26]:
 
 
@@ -1374,18 +1272,6 @@ def PhaseSpace(
                 d.AddCuts(SideBandRegion)
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[27]:
 
 
@@ -1397,24 +1283,6 @@ mlp.rcParams['xtick.labelsize'] = 16
 mlp.rcParams['ytick.labelsize'] = 16
 
 mlp.rcParams['legend.fontsize'] = 13
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[28]:
@@ -1645,96 +1513,6 @@ for log in [True,False]:
                         )
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[38]:
 
 
@@ -1947,24 +1725,6 @@ for gm in ['EE','EB']:
 
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[44]:
 
 
@@ -2106,46 +1866,4 @@ for gm in ['EE','EB']:
         plt.show()
         
         fig.savefig(figpath+VAR+'_Distr.png')
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[1]:
@@ -803,24 +803,6 @@ if weightCorrection:
         reWeight.append(data[i].weight*puWeight[i])
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[15]:
 
 
@@ -930,29 +912,11 @@ myVarNaming = {"EE":[
              }
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
 # In[17]:
 
 
 for d in data:
     print(d.name,len(d.df.runNumber))
-
-
-# In[ ]:
-
-
-
 
 
 # In[18]:
@@ -1027,12 +991,6 @@ for ph in phVals:
 
 
 # # Getting the Sideband region
-
-# In[ ]:
-
-
-
-
 
 # In[ ]:
 
@@ -1259,12 +1217,6 @@ for d in data:
         
 
 
-# In[ ]:
-
-
-
-
-
 # In[64]:
 
 
@@ -1485,12 +1437,6 @@ plt.show()
 
 # # ----------------- IOIOIOOIOIOO--------------
 
-# In[ ]:
-
-
-
-
-
 # In[25]:
 
 
@@ -1624,18 +1570,6 @@ for d in data:
 # In[ ]:
 
 
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
 #alpha, beta, rho = 0.5,0.5,1
 #del alpha, beta,rho
 k,N = 10,100
@@ -1716,10 +1650,4 @@ G(10,20) + T2( 8,1,10,20),
 G(10,20) + T2( 9,1,10,20),
 Bx(8, 10,20) - Bx(8,10,20) 
 )
-
-
-# In[ ]:
-
-
-
 
