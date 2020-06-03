@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[3]:
@@ -19,16 +19,16 @@ from Samples.ConfigData  import ConfigData
 
 
 class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
-    def __init__(self,name=None,stack = None,Print=False):
+    def __init__(self,stack = None,name=None,Print=False):
         StackList.__init__(self, stack)
         self.Print = Print
         if name is None:            
             self.name     = None
         else:
-            if type(variable) is list:
-                self.name     = self.name
+            if type(name) is list:
+                self.name     = name
             else:
-                self.name     = [ self.name ]
+                self.name     = [ name ]
     
     def size(self,sample=None,variable=None,weighted=True):
         if sample is None:
@@ -44,7 +44,7 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
     
     def append(self,stack,name=None):
         if name is None and stack.name is None:
-            raise "Name is not specified, provide argument \"name\" or set is in Histo"
+            raise "Name is not specified, provide argument \"name\" or setit in Histo"
         
         if name is None:
             name = stack.name
@@ -148,11 +148,12 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
     def savefig(self,fig,fullpath):
         fig.savefig(fullpath)
         
-    def savefigs(self,path):
+    def savefigs(self,path,Type="single"):
         for var in self[0].variable:
             for log in [True,False]:
                 fig, _ = self.plot(var,log=log)
-                self.savefig(fig, path+var)
+                LOG  = 'log/' if log else 'linear/'
+                self.savefig(fig, os.path.join(path,LOG,Type,var))
         
             
     def plotDataMC(self,bins,Data,MC,ax=None):
@@ -181,7 +182,11 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         
         return ax
     
-    def plot(self,variable,log=False,Type = "Single",Debug=False,order="l2m",ind=None):
+    def plot(self,variable,log=False,
+             order="l2m",ind=None,
+             xranges = None,yranges = None,limranges=None,
+             Type = "single",Debug=False,
+            ):
         super(HistoSample,self).setRC(plt.rc,Type=Type)
         
         fig = plt.figure()
@@ -195,11 +200,13 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         binc = [binc]*len(mc)
         
         prop = self.getProperties(names = self.getMCName() )
-        hist = plt.hist(binc,
-                         bins = bins,
-                         weights  = mc,
-                         **prop,
-                         )
+        mchist = plt.hist(
+                            binc,
+                            bins = bins,
+                            weights  = mc,
+                            stacked = True,
+                            **prop,
+                            )
         ax = plt.gca()
 
         ### Plot Data
@@ -225,9 +232,10 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
             plt.subplot2grid((4,1),(3,0), rowspan = 1, colspan = 1, sharex = ax)
             ax1 = plt.gca()            
 
-            self.plotDataMC(bins,data,mc[-1],ax1)
+            self.plotDataMC(bins,data,mchist[0][-1],ax1)
             ax1.set_xlabel(variable)
-
+            ax1.hlines(1,xmin=bins[0],xmax=bins[-1],linestyles='--',colors='r',alpha=0.5)
+            
             plt.tight_layout()
             fig.subplots_adjust(hspace=0)
         else:
@@ -235,6 +243,18 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
             
         ax.set_ylabel('Counts')
         ax.legend()
+        
+        if xranges is not None:
+            ax.set_xlim(xranges)
+            if self.getDataName() is not None:
+                ax1.set_xlim(xranges)
+        
+        if yranges is not None:
+            ax.set_ylim(yranges)
+            
+        if limranges is not None:
+            ax1.set_ylim(limranges)
+        
         if log:
             ax.set_yscale('log')
             
@@ -242,16 +262,4 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
             return fig,ax,binc,mc,data,prop,
         else:
             return fig,ax
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[1]:
@@ -17,24 +17,6 @@ class ProjectManage:
     def CreateDir(self,figpath,sufix='', Print = False):
         return CreateDir(figpath,sufix, Print )
 
-    def dirStructure(self, path,dictStruct,date=True,Print = False):
+    def dirStructure(self, path,dictStruct,date,Print = False):
         return dirStructure(path,dictStruct,date,Print )
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[ ]:
@@ -81,10 +81,4 @@ class ConfigHist:
         VarDict += self.Var2PlotDict(parts,var,ph)
 
         return PartVar,VarDict
-
-
-# In[ ]:
-
-
-
 

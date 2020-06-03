@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[3]:
@@ -169,10 +169,4 @@ class HistoVar(  StackList, ConfigMatplotlib, ConfigHist ):
         return fig,ax
     
     
-
-
-# In[ ]:
-
-
-
 

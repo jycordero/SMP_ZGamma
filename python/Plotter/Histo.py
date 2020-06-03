@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[2]:
@@ -140,10 +140,4 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         plt.legend()
         #plt.show()
         
-
-
-# In[ ]:
-
-
-
 

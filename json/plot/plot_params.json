@@ -1,5 +1,5 @@
 {
-        "Single":{
+        "single":{
 		"figure":{
 			"figsize":[10,10]
 			},
@@ -21,7 +21,7 @@
                         "fontsize":"medium"
                         }
                 },
-        "Mult":{
+        "mult":{
 		"figure":{
 			"figsize":[6,6]
 			},

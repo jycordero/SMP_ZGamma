@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[9]:
@@ -280,16 +280,4 @@ class CommonHelper:
                 indices.append(np.sum(CDF < samp))
             hist = np.histogram(dist[1][indices],bins=np.arange(-1,1.1,step=0.1))
             return np.array(hist[0])
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

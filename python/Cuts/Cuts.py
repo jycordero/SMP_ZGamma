@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
 # In[10]:
@@ -36,15 +36,21 @@ class Cuts:
         flag = self._DR_l1gm(event)
         flag *= self._DR_l2gm(event)
         
+        if self.MVA is not None and self.MVA: 
+            flag *= self._MVA(event)
+        
         if self.PhotonRadiation is not None:
             if self.PhotonRadiation == 'ISR': 
                 flag *= self._ISR(event)
             elif self.PhotonRadiation == 'FSR': 
                 flag *= self._ISR(event)
                 
-        if self.MVA is not None and self.MVA: 
-            flag *= self._MVA(event)
-            
+        # Implemented on the main code and not in this STD member 
+        '''
+        if self.VetoDY is not None:
+            flag *= self._vetoDY(event)
+        '''
+        
         if self.OppositeCharge is not None: 
             if self.OppositeCharge:
                 flag *= self._oppositeCharge(event)
@@ -63,10 +69,13 @@ class Cuts:
         return ABS(event.value('eventWeight')) < 1000
         
     def _vetoDY(self,event):
-        return event.value('vetoDY') == False
+        return event.value('vetoDY') == self.VetoDY
     
     def _oppositeCharge(self,event):
         return event.value('leptonOneCharge') != event.value('leptonTwoCharge')
+    
+    def _sameCharge(self,event):
+        return event.value('leptonOneCharge') == event.value('leptonTwoCharge')
     
     def _MVA(self,event):
         return event.value('photonOneMVA') > 2
@@ -81,7 +90,7 @@ class Cuts:
         return event.value('l1PhotonDR') > 0.7
     
     def _DR_l2gm(self,event):
-        return event.value('l1PhotonDR') > 0.7
+        return event.value('l2PhotonDR') > 0.7
     
 
 
@@ -183,16 +192,4 @@ class Cuts:
 
 
                         
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

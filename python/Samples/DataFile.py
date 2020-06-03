@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+
 # coding: utf-8
 
-# In[ ]:
+# In[2]:
 
 
 from glob import glob
@@ -9,7 +9,7 @@ import os
 import numpy as np
 
 
-# In[ ]:
+# In[3]:
 
 
 from Common.CommonHelper import CommonHelper
@@ -18,7 +18,7 @@ from Samples.Data import Data
 from Samples.ConfigData import ConfigData
 
 
-# In[ ]:
+# In[4]:
 
 
 class DataFile( StackList, ConfigData ):
@@ -26,7 +26,7 @@ class DataFile( StackList, ConfigData ):
         self.path = os.path.join(path, name) #/PATHTODATA/SAMPLE
         self.name = name
         self.era  = era
-        self.data = self.isData(name)
+        self.data = super().isData(name)
         self.chunksize = chunksize
         self.confpath = "/home/jcordero/CMS/SMP_ZGamma/json/data/"
         
@@ -64,16 +64,4 @@ class DataFile( StackList, ConfigData ):
     def Total(self):
         return np.sum([istck.getTotal() for istck in self.stack])
        
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
