@@ -45,7 +45,9 @@ class CommonHelper:
         def isNumeric(num):
             try: float(num)
             except: return False
-            else: return True
+            else: 
+                if type(num) is str: return False
+                else: return True
         
         @staticmethod
         def isIterable(ite):

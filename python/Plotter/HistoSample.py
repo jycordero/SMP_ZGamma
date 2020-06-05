@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[1]:
 
 
 import os
@@ -15,20 +15,18 @@ from Common.StackList    import StackList
 from Samples.ConfigData  import ConfigData
 
 
-# In[ ]:
+# In[2]:
 
 
 class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
     def __init__(self,stack = None,name=None,Print=False):
-        StackList.__init__(self, stack)
-        self.Print = Print
-        if name is None:            
-            self.name     = None
-        else:
+        StackList.__init__(self, name=name, stack=stack ,Print=Print)
+
+        if name is not None:
             if type(name) is list:
-                self.name     = name
+                self.names     = name
             else:
-                self.name     = [ name ]
+                self.names     = [ name ]                
     
     def size(self,sample=None,variable=None,weighted=True):
         if sample is None:
@@ -51,31 +49,17 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         else:
             stack.name = name
         
-        self.vappend(stack)
-        
-    def vappend(self,stack):
-        super().append(stack)
-        self.__addVariable(stack.name)
-    
-    
-    def __addVariable(self,name):
-        if self.name is None:
-            self.name = []
-        
-        if name is not None:
-            if type(name) is list:
-                self.name  += name
-            else:
-                self.name  += [ name ]
+        super().append(stack,stack.name)
                 
     def getEntries(self):
         return self.sizes(weighted=False)
     
     def _setOrder(self,ind):
-        self.name = list(np.array(self.name)[ind])
+        #self.name = list(np.array(self.name)[ind])
+        self.names = list(np.array(self.names)[ind])
         self.stack = self[ind]
     
-    def _order(self,order="l2m",weighted=True,ind=None):
+    def _order(self,order="l2m",ind=None,weighted=True,):
         if ind is None:
             entries = self.sizes()
             ind = np.argsort(entries)
@@ -86,12 +70,19 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
             else:
                 print("Type of ordering is not supported")
         else:
+            try: 
+                #ind  = [self.name.index(nm)  for nm in ind]
+                ind  = [self.names.index(nm)  for nm in ind]
+            except:
+                ind = ind
+                
             self._setOrder(ind)
     
     def Name2Index(self,sample):
         index = np.arange(len(self))
         try:
-            return int(index[np.array(self.name) == sample])
+            #return int(index[np.array(self.name) == sample])
+            return int(index[np.array(self.names) == sample])
         except:
             return None
         
@@ -100,7 +91,8 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
     
     def getDataName(self):
         names = []
-        for nm in self.name:
+        #for nm in self.name:
+        for nm in self.names:
             if super().isData(nm):
                 return str(nm)
             
@@ -111,14 +103,16 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         
     def getMCName(self):
         names = []
-        for nm in self.name:
+        #for nm in self.name:
+        for nm in self.names:
             if not super().isData(nm):
                 names.append(str(nm))
         return names
     
     def getProperties(self,names=None):
         if names is None:
-            names = self.name
+            #names = self.name
+            names = self.names
         prop = {}
         prop['color']    = [ super(HistoSample,self).getColor(name) for name in names]
         prop['label']    = [ super(HistoSample,self).getLabel(name) for name in names]
@@ -130,30 +124,32 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         return hist[-1]
     
     def pop(self,i):
-        self.name.pop(i)
+        #self.name.pop(i)
+        self.names.pop(i)
         return super().pop(i)
         
     def merge(self,samples,name=None):
         if name is None:
             raise BaseException("Provide a name for the merged sample")
 
-        Merge = sum([self.pop(self.Name2Index(smp)) for smp in samples if self.Name2Index(smp)])
+        Merge = sum([self.pop(self.Name2Index(smp)) for smp in samples if CommonHelper.Type.isNumeric(self.Name2Index(smp))])
 
         self.append(Merge,name)
         
     def savehists(self,path,prefix=""):
         for i, histo in enumerate(self):
-            histo.save(path,prefix+self.name[i])
+            #histo.save(path,prefix+self.name[i])
+            histo.save(path,prefix+self.names[i])
 
     def savefig(self,fig,fullpath):
         fig.savefig(fullpath)
         
-    def savefigs(self,path,Type="single"):
+    def savefigs(self,path,Type="single",ind=None):
         for var in self[0].variable:
             for log in [True,False]:
-                fig, _ = self.plot(var,log=log)
+                fig, _ = self.plot(var,log=log,ind=ind)
                 LOG  = 'log/' if log else 'linear/'
-                self.savefig(fig, os.path.join(path,LOG,Type,var))
+                self.savefig(fig,fullpath=os.path.join(path,LOG,Type,var) )
         
             
     def plotDataMC(self,bins,Data,MC,ax=None):
@@ -185,6 +181,7 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
     def plot(self,variable,log=False,
              order="l2m",ind=None,
              xranges = None,yranges = None,limranges=None,
+             WithYield = None,
              Type = "single",Debug=False,
             ):
         super(HistoSample,self).setRC(plt.rc,Type=Type)
@@ -192,7 +189,7 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         fig = plt.figure()
         plt.subplot2grid((4,1),(0,0),rowspan = 3, colspan = 1)
         
-        self._order(order,ind)
+        self._order(order,ind=ind)
         
         mc = [ self[name][variable].values  for name in self.getMCName() ]
         bins = self.stack[0][variable].bins
@@ -200,6 +197,9 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         binc = [binc]*len(mc)
         
         prop = self.getProperties(names = self.getMCName() )
+        if WithYield:
+            for i,label in enumerate(prop['label']):
+                prop['label'][i] += ": "+ str(round(np.sum(mc[i])))
         mchist = plt.hist(
                             binc,
                             bins = bins,
@@ -211,14 +211,17 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
 
         ### Plot Data
         if self.getDataName() is not None:
-            prop = {'marker':'o',
-                'color':'k',    
-                'linestyle':'',
-                'label':'Data',
-               }
             data = self[self.getDataName()][variable].values
             err = np.sqrt(data)
-
+            
+            prop = {'marker':'o',
+                    'color':'k',    
+                    'linestyle':'',
+                    'label':'Data',
+                   }
+            
+            if WithYield:
+                prop['label'] += ": "+str(round(np.sum(data)))
             plt.errorbar(binc[0],
                          data,
                          xerr = np.diff(bins)/2,
@@ -227,12 +230,15 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
                         )
 
             ax = plt.gca()          
-
+            #ax.set_xticklabels([])
+            
             ### Plot Data/MC
             plt.subplot2grid((4,1),(3,0), rowspan = 1, colspan = 1, sharex = ax)
             ax1 = plt.gca()            
 
             self.plotDataMC(bins,data,mchist[0][-1],ax1)
+                        
+            #ax1.set_xticklabels(bins)
             ax1.set_xlabel(variable)
             ax1.hlines(1,xmin=bins[0],xmax=bins[-1],linestyles='--',colors='r',alpha=0.5)
             

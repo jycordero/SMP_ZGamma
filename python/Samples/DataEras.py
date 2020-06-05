@@ -11,7 +11,7 @@ from Common.StackList import StackList
 
 
 class DataEras( StackList ):
-    def __init__(self,stack=None):
-        StackList.__init__(self,stack)
+    def __init__(self,stack=None,name=None):
+        StackList.__init__(self,name=name,stack=stack)
         
 

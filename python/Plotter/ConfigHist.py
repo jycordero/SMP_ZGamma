@@ -53,6 +53,15 @@ class ConfigHist:
         PartVar = []
         VarDict = []
 
+        '''
+        parts = [" "]
+        var = ["eventWeight","nPV"]
+        ph = [""]
+        #ph = ["","_EE","_EB"]
+        PartVar += [p+v+gm for p in parts for v in var for gm in ph]
+        VarDict += self.Var2PlotDict(parts,var,ph)    
+        '''
+        
         parts = ["photonOne","leptonOne","leptonTwo","dilepton","llg"]
         var = ["Pt"]
         ph = [""]

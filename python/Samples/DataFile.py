@@ -30,7 +30,7 @@ class DataFile( StackList, ConfigData ):
         self.chunksize = chunksize
         self.confpath = "/home/jcordero/CMS/SMP_ZGamma/json/data/"
         
-        StackList.__init__(self, self._loadFiles() )
+        StackList.__init__(self, name = name, stack = self._loadFiles() )
     
 
     def _loadFiles(self):
@@ -62,6 +62,9 @@ class DataFile( StackList, ConfigData ):
         return np.sum([istck.N() for istck in self.stack])
     
     def Total(self):
-        return np.sum([istck.getTotal() for istck in self.stack])
+        return np.sum([istck.Total() for istck in self.stack])
+    
+    def getBin(self,n):
+        return np.sum([istck.getBin(n) for istck in self.stack])
        
 

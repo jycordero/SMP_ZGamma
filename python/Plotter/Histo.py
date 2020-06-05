@@ -22,10 +22,11 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         self.variable = variable
         self.name   = variable["part"]+variable["var"]+variable["ph"]
         
-        self.nbins  = nbins
-        self.ranges = ranges
-        self.bins   = bins #bins most be in list/array format
-        self.values = None
+        self.nbins   = nbins
+        self.ranges  = ranges
+        self.bins    = bins #bins most be in list/array format
+        self.weights = None
+        self.values  = None
         self.entries = 0
         
         if self.bins is None:
@@ -33,17 +34,21 @@ class Histo( ConfigMatplotlib, ConfigHist ):
                 step = (self.ranges[1] - self.ranges[0])/self.nbins
                 self.bins = [self.ranges[0] + step*i for i in range(self.nbins)]
                 self.values = [0]*(len(self.bins)-1)
+                self.weights = [0]*(len(self.bins)-1)
         else:
             if type(self.bins) is int:
                 self.nbins = len(self.bins)
                 step = (self.ranges[1] - self.ranges[0])/self.nbins
                 self.bins = [self.ranges[0] + step*i for i in range(self.nbins)]
                 self.values = [0]*(len(self.bins)-1)
+                self.weights = [0]*(len(self.bins)-1)
             else:
                 self.nbins = len(bins)
                 self.ranges = [bins[0],bins[-1]]
                 self.values = [0]*(len(self.bins)-1)
+                self.weights = [0]*(len(self.bins)-1)
         
+        #weights initiated but not implemented
     
     def __repr__(self):              
         msg= "Histo(bins="+str(self.bins)+",\n"              "      nbins="+str(self.nbins)+",\n"              "      ranges="+str(self.ranges)+")"
@@ -126,7 +131,7 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         df = pd.DataFrame.from_dict({'binc':binc,'values':self.values})
         df.to_csv(path+prefix+self.name+".csv")
     
-    def plot(self,log=False,Type="Single"):
+    def plot(self,log=False,Type="single"):
         
         super(Histo,self).setRC(plt.rc,Type=Type)
         binc = CommonHelper.Plot.BinFormat(Bins=self.bins, Type="center")

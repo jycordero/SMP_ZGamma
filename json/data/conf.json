@@ -1,5 +1,17 @@
 {
 	"2016":{
-		"selection":{"ee"
+		"ee":"EfficiencyCorrection/files_zee/TagProbe/",
+		"elelg":"V2",
+		"mumug":"V2"
 		},
+	"2017":{
+		"ee":"EfficiencyCorrection/files_zee/V4_phID_isConv/",
+		"elelg":"",
+		"mumug":"VDask"
+		},
+	"2018":{
+		"ee":"EfficiencyCorrection/files_zee/V2_trigBits_pu/",
+		"elelg":"",
+		"mumug":"VDask"
+		}	
 }

@@ -40,9 +40,9 @@ class Data( ConfigData ):
         
     def N(self):
         try:
-            return self.Total() - 2*self.getBin(30)
+            return self.getBin(1) - 2*self.getBin(30)
         except:
-            return self.Total()
+            return self.getBin(1)
         
     def Total(self):
         return self.getBin(1)
