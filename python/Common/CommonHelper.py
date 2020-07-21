@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[9]:
@@ -11,7 +11,7 @@ import scipy.special as spc
 from functools import wraps
 
 
-# In[4]:
+# In[2]:
 
 
 class CommonHelper:
@@ -81,10 +81,14 @@ class CommonHelper:
                 convert = varS
             else:
                 if '[' in varS:
-                    convert = [float(v) for v in varS.replace('[ ','').replace('[','').replace(']','').replace(' ]','').replace(',','').replace('  ',' ').split(' ')]
+                    convert = []
+                    for v in varS.split(','):
+                        val = v.replace('[','').replace(']','').replace(' ','')
+                        if val != '':
+                             convert.append(float(val))
+                    #convert = [float(v) for v in varS.replace('[ ','').replace(']','').replace(',','').replace('  ',' ').split(' ')]
                 elif type(varS) is list:
                     convert = varS
-
                 else:
                     convert = float(varS)
             return convert        
@@ -201,6 +205,38 @@ class CommonHelper:
             sigma = alpha / np.sqrt(2 * np.log(2))
             return np.real(wofz(((x-mean) + 1j*gamma)/sigma/np.sqrt(2))) / sigma                                                                   /np.sqrt(2*np.pi)
         @staticmethod
+        def Voigt_CMS(
+                        xc,
+                        NSig, NBkg, 
+                        sig, Gamma, mean,
+                        alpha, beta, peak, gamma,
+                        ):
+            x = xc            
+            argVoigt = sig, Gamma, mean
+            arg      = alpha, beta, peak, gamma
+            Temp = list(CommonHelper.Math.Template(NSig, 
+                                                   NBkg, 
+                                                   CommonHelper.Math.Voigt(x,*argVoigt) , 
+                                                   CommonHelper.Math.RooCMSShape(x,*arg)))
+
+            return np.array(Temp)
+
+
+        @staticmethod
+        def RooCMSShape(x,*arg):
+            alpha, beta, peak, gamma = arg
+
+            erf = spc.erfc((alpha - x)*beta)
+            u = (x-peak)*gamma
+            u = np.exp(-u)  
+            u[u <- 70] = u[u <- 70]*0 + 1e20
+            u[u > 70]  = u[u > 70]*0
+            ind  =  np.logical_and(u>=-70, u<=70)
+            u[ind]     = np.exp(-u[ind])
+            return erf*u
+
+        
+        @staticmethod
         def NLL(DATA,Temp,*arg):
             Model = Temp(*arg)
             return np.sum(Model) - np.sum(DATA*np.log(Model))
@@ -282,4 +318,16 @@ class CommonHelper:
                 indices.append(np.sum(CDF < samp))
             hist = np.histogram(dist[1][indices],bins=np.arange(-1,1.1,step=0.1))
             return np.array(hist[0])
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 

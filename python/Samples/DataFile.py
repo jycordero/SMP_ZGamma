@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[2]:
@@ -37,7 +37,7 @@ class DataFile( StackList, ConfigData ):
         DataFiles = []
         for files in self._getFiles():
             filename = files.split("/")[-1]
-            DataFiles.append( Data(files, self.name, filename, self.chunksize) )
+            DataFiles.append( Data(files, self.name, filename, chunksize = self.chunksize) )
         return DataFiles
     
     def _getFiles(self):

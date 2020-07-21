@@ -1,7 +1,7 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 import os
@@ -14,13 +14,13 @@ from Plotter.ConfigMatplotlib import ConfigMatplotlib
 from Common.CommonHelper import CommonHelper
 
 
-# In[1]:
+# In[3]:
 
 
 class Histo( ConfigMatplotlib, ConfigHist ):
     def __init__(self, bins=None, nbins=None, ranges=None, variable = None):
         self.variable = variable
-        self.name   = variable["part"]+variable["var"]+variable["ph"]
+        self.name   = variable["part"]+variable["var"]+variable["ph"]+variable["extra"]
         
         self.nbins   = nbins
         self.ranges  = ranges
@@ -65,7 +65,7 @@ class Histo( ConfigMatplotlib, ConfigHist ):
     def __add__(self,other):
         #if other.bins != self.bins:
         #    raise BaseException("bins must match")
-        histo = Histo(self.bins, self.nbins,self.ranges, self.variable)
+        histo = Histo(self.bins, self.nbins, self.ranges, self.variable)
         histo.entries = self.entries + other.entries
         histo.values = list(np.array(self.values) + np.array(other.values))
         
@@ -76,21 +76,6 @@ class Histo( ConfigMatplotlib, ConfigHist ):
             return self
         else:
             return self.__add__(other)
-    
-    def _getRanges(self,part,var,ph):
-        rangefile = self.confpath + "ranges.csv"
-        Range = pd.read_csv(rangefile)
-        ranges = Range.loc[Range['part'] == part+ph][var].values[0]
-        ranges = CommonHelper.Format.ConvertString2Float(ranges)    
-        return ranges
-    
-    def _getBins(self,part,var,ph):       
-        binfile = self.confpath + "bins.csv"
-        Bins = pd.read_csv(binfile)
-        bins = Bins.loc[Bins['part'] == part][var].values[0]
-        bins = CommonHelper.Format.ConvertString2Float(bins)
-        #bins = np.array(CommonHelper.Plot.BinFormat(Bins=bins,ranges=ranges,Type='edges'))
-        return bins
     
     def setup(self,bins=None,ranges=None,nbins=None):
         self.ranges = ranges
@@ -118,18 +103,26 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         
     
     def fill(self,dfvalues,weight=None):
-        if weight is None: weight = [1]*len(dfvalues)
-        self.entries += len(dfvalues)
-        weight = self._OutOfRangeClean(weight,dfvalues) #weight must be done first
-        dfvalues = self._OutOfRangeClean(dfvalues)
-             
-        for i in range(len(self.bins)-1):
-            self.values[i] += self._getBinCount(i,dfvalues,weight)
+        if type(dfvalues) is not pd.DataFrame:
+            if weight is None: weight = [1]*len(dfvalues)
+            self.entries += len(dfvalues)
+            weight = self._OutOfRangeClean(weight,dfvalues) #weight must be done first
+            dfvalues = self._OutOfRangeClean(dfvalues)
+
+            for i in range(len(self.bins)-1):
+                self.values[i] += self._getBinCount(i,dfvalues,weight)
+        else:
+            if weight is None: weight = [1]*len(dfvalues)
+            self.values = dfvalues['values']
+            self.entries = dfvalues['values'].sum()
+
     
     def save(self,path,prefix=""):
+        path = os.path.join(path,self.name+".csv")
+        
         binc = CommonHelper.Plot.BinFormat(Bins=self.bins, Type="center")
         df = pd.DataFrame.from_dict({'binc':binc,'values':self.values})
-        df.to_csv(path+prefix+self.name+".csv")
+        df.to_csv(path)
     
     def plot(self,log=False,Type="single"):
         
@@ -145,4 +138,17 @@ class Histo( ConfigMatplotlib, ConfigHist ):
         plt.legend()
         #plt.show()
         
+
+
+# In[4]:
+
+
+if __name__ == "__main__":
+    print("Test")
+
+
+# In[ ]:
+
+
+
 

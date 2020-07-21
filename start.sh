@@ -11,7 +11,8 @@ else
 		PORT=8889
 	fi
 	#source activate CMSenv
-	conda activate envSMP
+	#conda activate envSMP
+	source activate envSMP
 	source setup.sh
 
 	if [ "$MODE" = "remote" ]; then

@@ -252,6 +252,20 @@
 
 			"label":"Data"
 	},
+	"Electron":{
+			"plot":{
+				"color":"k",
+				"linewidth":"none",
+				"marker":"o"
+			},
+			"hist":{
+				"color":"k",
+				"histtype":"stepfilled"
+			},
+			"color":"k",
+
+			"label":"Data"
+	},
 	"Data":{
 		
 			"plot":{

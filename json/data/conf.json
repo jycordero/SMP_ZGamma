@@ -1,17 +1,17 @@
 {
 	"2016":{
-		"ee":"EfficiencyCorrection/files_zee/TagProbe/",
+		"ee":"EfficiencyCorrection/files_zee/TagProbe",
 		"elelg":"V2",
 		"mumug":"V2"
 		},
 	"2017":{
-		"ee":"EfficiencyCorrection/files_zee/V4_phID_isConv/",
-		"elelg":"",
+		"ee":"EfficiencyCorrection/files_zee/V4_phID_isConv",
+		"elelg":"V1",
 		"mumug":"VDask"
 		},
 	"2018":{
-		"ee":"EfficiencyCorrection/files_zee/V2_trigBits_pu/",
-		"elelg":"",
-		"mumug":"VDask"
+		"ee":"EfficiencyCorrection/files_zee/V4_trig",
+		"elelg":"V1",
+		"mumug":"V3_trigBits"
 		}	
 }

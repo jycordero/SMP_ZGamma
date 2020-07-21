@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[10]:
@@ -8,7 +8,7 @@ import numpy as np
 from Common.Logic import AND, OR, NOT, ABS
 
 
-# In[13]:
+# In[ ]:
 
 
 class Cuts:
@@ -32,9 +32,17 @@ class Cuts:
             flag *= self._Region(event, Region)
         return flag
     
+    def CutRange(self,event,var,ranges):
+        return AND(event.value(var) >= ranges[0], event.value(var) < ranges[1])
+    
+    def CutFlag(self,event,var,flag):
+        return event.value(var) == flag
+    
     def _STD(self,event):    
-        flag = self._DR_l1gm(event)
-        flag *= self._DR_l2gm(event)
+        flag = np.ones(len(event), dtype= np.bool)
+        
+        #flag = self._DR_l1gm(event)
+        #flag *= self._DR_l2gm(event)
         
         if self.MVA is not None and self.MVA: 
             flag *= self._MVA(event)
@@ -92,7 +100,15 @@ class Cuts:
     def _DR_l2gm(self,event):
         return event.value('l2PhotonDR') > 0.7
     
-
+    
+    def IDPass(self,event,flag = True):
+        return event.value("ProbeIDPass") == flag
+    def ISOPass(self,event,flag = True):
+        return event.value("ProbeISOPass") == flag     
+    def WorstPass(self,event,flag = True):
+        return event.value("ProbeWorstPass") == flag
+    def ProbeSigPass(self,event,flag = True):
+        return event.value("ProbeSigPass") == flag
 
     
     def EB(self,event):
@@ -192,4 +208,28 @@ class Cuts:
 
 
                         
+
+
+# In[ ]:
+
+
+
+
+
+# In[1]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 

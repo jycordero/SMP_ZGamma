@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[1]:
@@ -12,10 +12,11 @@ from Plotter.ConfigMatplotlib import ConfigMatplotlib
 from Plotter.ConfigHist  import ConfigHist
 from Common.CommonHelper import CommonHelper
 from Common.StackList    import StackList
+from Common.IO           import openJson
 from Samples.ConfigData  import ConfigData
 
 
-# In[2]:
+# In[1]:
 
 
 class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
@@ -55,14 +56,12 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         return self.sizes(weighted=False)
     
     def _setOrder(self,ind):
-        #self.name = list(np.array(self.name)[ind])
-        self.names = list(np.array(self.names)[ind])
-        self.stack = self[ind]
+        self.names = list(np.array(self.names)[list(ind)])
+        self.stack = self[list(ind)]
     
     def _order(self,order="l2m",ind=None,weighted=True,):
         if ind is None:
-            entries = self.sizes()
-            ind = np.argsort(entries)
+            ind = np.argsort(self.sizes())
             if order == "l2m":
                 self._setOrder(ind)
             elif order == "m2l":
@@ -71,7 +70,6 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
                 print("Type of ordering is not supported")
         else:
             try: 
-                #ind  = [self.name.index(nm)  for nm in ind]
                 ind  = [self.names.index(nm)  for nm in ind]
             except:
                 ind = ind
@@ -91,7 +89,6 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
     
     def getDataName(self):
         names = []
-        #for nm in self.name:
         for nm in self.names:
             if super().isData(nm):
                 return str(nm)
@@ -103,20 +100,30 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         
     def getMCName(self):
         names = []
-        #for nm in self.name:
         for nm in self.names:
             if not super().isData(nm):
                 names.append(str(nm))
         return names
     
-    def getProperties(self,names=None):
+    def getProperties(self,names=None,color=None,label=None,histtype=None):
         if names is None:
-            #names = self.name
             names = self.names
+            
         prop = {}
-        prop['color']    = [ super(HistoSample,self).getColor(name) for name in names]
-        prop['label']    = [ super(HistoSample,self).getLabel(name) for name in names]
-        prop['histtype'] = super(HistoSample,self).getHisttpe(names[0])
+        if color is not None:
+            prop['color'] = color
+        else:
+            prop['color']    = [ super(HistoSample,self).getColor(name) for name in names]
+        
+        if label is not None:
+            prop['label'] = label
+        else:
+            prop['label']    = [ super(HistoSample,self).getLabel(name) for name in names]
+        
+        if histtype is not None:
+            prop['histtype'] = histtype
+        else:
+            prop['histtype'] = super(HistoSample,self).getHisttpe(names[0])
 
         return prop
     
@@ -124,7 +131,6 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         return hist[-1]
     
     def pop(self,i):
-        #self.name.pop(i)
         self.names.pop(i)
         return super().pop(i)
         
@@ -137,9 +143,8 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         self.append(Merge,name)
         
     def savehists(self,path,prefix=""):
-        for i, histo in enumerate(self):
-            #histo.save(path,prefix+self.name[i])
-            histo.save(path,prefix+self.names[i])
+        for i, histo in enumerate(self):            
+            histo.save(path,prefix)
 
     def savefig(self,fig,fullpath):
         fig.savefig(fullpath)
@@ -151,6 +156,43 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
                 LOG  = 'log/' if log else 'linear/'
                 self.savefig(fig,fullpath=os.path.join(path,LOG,Type,var) )
         
+            
+    def CollaborationTitle(self,ax,era):
+        param = {
+                #'fontfamily':'Palatino',
+                'fontweight':'bold',
+                'size':20
+                }
+        ax.text(0,1.01,"CMS",
+                 **param,
+                 transform=ax.transAxes
+                 )
+        param = {
+                #'fontweight':'bold',
+                'size':20
+                }
+        ax.text(0.1,1.01,
+                 #"work in progress",
+                "Preliminary",
+                 **param,
+                 transform=ax.transAxes
+                 )
+
+
+        param = {
+                'fontweight':'bold',
+                'size':18
+                }
+
+        path = '/home/jcordero/CMS/SMP_ZGamma/json/data/'
+        lumi = str(round(float(openJson(path+'lumi.json')[era]),1))
+        ax.text(0.57,1.01, r""+lumi+" fb$^{-1}$ (13 TeV) "+era+"",
+                 **param,
+                 transform=ax.transAxes
+                 )
+    
+    
+                
             
     def plotDataMC(self,bins,Data,MC,ax=None):
         if ax is None:
@@ -178,16 +220,38 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
         
         return ax
     
+    def getStatUncertainty(self,x,y):
+        yy = []
+        for i,h in enumerate(y):
+            yy.append(h)
+            yy.append(h)
+        yy = np.array(yy)    
+
+        xx = []
+        for i,h in enumerate(x):
+            if i == 0 or i == len(x)-1:
+                xx.append(h)
+            else:
+                xx.append(h)
+                xx.append(h)
+        
+        return np.array(xx),np.array(yy),np.sqrt(yy)
+        
+    
     def plot(self,variable,log=False,
              order="l2m",ind=None,
+             shape = (4,1), loc   = 0,
              xranges = None,yranges = None,limranges=None,
              WithYield = None,
              Type = "single",Debug=False,
+             Create = True,
             ):
-        super(HistoSample,self).setRC(plt.rc,Type=Type)
+        super().setRC(plt.rc,Type=Type)
         
-        fig = plt.figure()
-        plt.subplot2grid((4,1),(0,0),rowspan = 3, colspan = 1)
+        if Create:
+            fig = plt.figure()
+            
+        plt.subplot2grid(shape,(0,loc),rowspan = 3, colspan = 1)
         
         self._order(order,ind=ind)
         
@@ -208,6 +272,17 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
                             **prop,
                             )
         ax = plt.gca()
+        
+        statx, statyc, statysig = self.getStatUncertainty(mchist[1],mchist[0][-1])
+        ax.fill_between(statx,statyc+statysig, statyc-statysig,
+                        color='grey',alpha = 0.05,
+                        zorder = 5)
+        ax.fill_between(statx,statyc+statysig, statyc-statysig,
+                        facecolor='none',alpha = 0.5,edgecolor='black',
+                        hatch = '////',linewidth=0.0,zorder=6,
+                        label = "MC stat unc")
+        
+        self.CollaborationTitle(ax,self.name)
 
         ### Plot Data
         if self.getDataName() is not None:
@@ -233,7 +308,7 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
             #ax.set_xticklabels([])
             
             ### Plot Data/MC
-            plt.subplot2grid((4,1),(3,0), rowspan = 1, colspan = 1, sharex = ax)
+            plt.subplot2grid(shape,(3,loc), rowspan = 1, colspan = 1, sharex = ax)
             ax1 = plt.gca()            
 
             self.plotDataMC(bins,data,mchist[0][-1],ax1)
@@ -243,6 +318,8 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
             ax1.hlines(1,xmin=bins[0],xmax=bins[-1],linestyles='--',colors='r',alpha=0.5)
             
             plt.tight_layout()
+            
+            fig = plt.gcf()
             fig.subplots_adjust(hspace=0)
         else:
             ax.set_xlabel(variable)
@@ -265,7 +342,27 @@ class HistoSample( StackList, ConfigMatplotlib, ConfigHist, ConfigData):
             ax.set_yscale('log')
             
         if Debug:
-            return fig,ax,binc,mc,data,prop,
+            fig = plt.gcf()
+            try:
+                return fig,[ax,ax1],binc,mc,data,prop,
+            except:
+                return fig,ax,binc,mc,data,prop,
         else:
-            return fig,ax
+            fig = plt.gcf()
+            try:
+                return fig,[ax,ax1]
+            except:
+                return fig,ax
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 

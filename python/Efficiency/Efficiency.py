@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python
 # coding: utf-8
 
 # In[1]:
@@ -10,14 +10,14 @@ import scipy.special as spc
 import matplotlib.pyplot as plt
 
 
-# In[2]:
+# In[1]:
 
 
-from ROOT import TCanvas, TFile
+from ROOT import TCanvas, TFile, TTree
 from Common.CommonHelper import CommonHelper
 
 
-# In[ ]:
+# In[2]:
 
 
 class Efficiency():
@@ -186,8 +186,10 @@ class Efficiency():
                   Alternative = {},
                   Abs1 = False, Abs2 = False,
                 ):
-        """Gets the yields on the samples distribution, binned in 2d"""
-        """ Dist1 and Dist2 corresponding distributions for variables of bins1 and bins2"""
+        """
+        Gets the yields on the samples distribution, binned in 2d \n
+        Dist1 and Dist2 corresponding distributions for variables of bins1 and bins2
+        """
         
         ### Input validation
         bins1, bin2 = self.__validationForYield(bins1,bins2)
@@ -761,4 +763,10 @@ class EffConf:
 
 
 CommonHelper
+
+
+# In[ ]:
+
+
+
 
