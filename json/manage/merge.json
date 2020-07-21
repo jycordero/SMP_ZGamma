@@ -1,0 +1,21 @@
+{
+	"2016":{
+		"Diboson":["WWToLNuQQ","WWTo2L2Nu","WZTo2L2Q","WZTo3LNu","ZZTo2L2Nu","ZZTo2L2Q","ZZTo4L"],
+		"DoubleMuon":["DoubleMuon_2016B","DoubleMuon_2016C","DoubleMuon_2016D","DoubleMuon_2016E","DoubleMuon_2016F","DoubleMuon_2016G","DoubleMuon_2016H"],
+		"DoubleEG":"",
+		"Electron":["Electron_2016B","Electron_2016C","Electron_2016D","Electron_2016E","Electron_2016F","Electron_2016G","Electron_2016H"]
+	},
+	"2017":{
+		"Diboson":["WWTo2L2Nu","WZTo2L2Q","WZTo3LNu","ZZTo2L2Nu","ZZTo2L2Q","ZZTo4L"],
+		"DoubleMuon":["DoubleMuon_2017B","DoubleMuon_2017C","DoubleMuon_2017D","DoubleMuon_2017E","DoubleMuon_2017F"],
+		"DoubleEG":["DoubleEG_2017B","DoubleEG_2017C","DoubleEG_2017D","DoubleEG_2017E","DoubleEG_2017F"],
+		"Electron":["Electron_2017B","Electron_2017C","Electron_2017D","Electron_2017E","Electron_2017F"]
+	},
+	"2018":{
+		"Dibosoni_mumug":["WWTo2L2Nu","WZTo2L2Q","WZTo3LNu","ZZTo2L2Nu","ZZTo2L2Q","ZZTo4L"],
+		"Diboson":["WWTo2L2Nu","WZTo3LNu","ZZTo2L2Nu","ZZTo2L2Q","ZZTo4L"],
+		"DoubleMuon":["DoubleMuon_2018A","DoubleMuon_2018B","DoubleMuon_2018C","DoubleMuon_2018D"],
+		"DoubleEG":["DoubleEG_2018A","DoubleEG_2018B","DoubleEG_2018C","DoubleEG_2018D"],
+		"Electron":["Electron_2018A","Electron_2018B","Electron_2018C","Electron_2018D"]
+	}
+}

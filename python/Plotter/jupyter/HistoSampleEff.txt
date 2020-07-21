@@ -1,0 +1,470 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import array
+
+from ROOT import TFile,TTree,TH2F,gROOT,gStyle,TCanvas
+
+from iminuit import Minuit
+
+from Common.CommonHelper import CommonHelper
+from Plotter.HistoSample import HistoSample
+
+class HistoSampleEff( HistoSample ):
+    def __init__(self,stack = None,name=None,Print=False):
+        HistoSample.__init__(self,name=name,stack=stack,Print=Print)    
+        
+        self.effConfPath = "/home/jcordero/CMS/SMP_ZGamma/json/plot/eff_fit_ini.json"
+
+        self.FitRes = {}
+        
+        self.effMC = {}
+        self.effMCStat = {}
+        
+        self.eff = {}
+        self.effStat = {}
+        
+        self.nBin1 = 0
+        self.nBin2 = 0
+        
+    def __getEffConf(self):
+        import json
+        with open(self.effConfPath) as f:
+            JS = f.read()
+        return json.loads(JS)        
+        
+    def InitializeParams(self,i,j,BinType, isConv):
+        bounds = self.getBounds()
+        pPass = self.getFit(BinType,isConv,j,i,"pass")
+        pFail = self.getFit(BinType,isConv,j,i,"fail")
+        return pPass, pFail, bounds   
+        
+    def getBounds(self):
+        return [self.__getEffConf()["bounds"]["min"],self.__getEffConf()["bounds"]["max"]]
+        
+    def getFitIni(self,BinType,isConv):
+        conv = "convVeto" if isConv else "noconvVeto"
+        return self.__getEffConf()[BinType][conv]
+    
+    def getFit(self,BinType,isConv,bin1Index,bin2Index,ProbeType):        
+        return self.getFitIni(BinType,isConv)["bins"+str(bin1Index)]["bins"+str(bin2Index)][ProbeType]        
+        
+    def GetYieldMC(self):
+        Yield = {}
+        for h in self.getMC():
+            Yield[h.name] = {}
+            for ih in h:
+                Yield[h.name][ih.name] = ih.size()
+        return Yield
+    
+    def GetYieldOneData(self,n,ax1,ax2,Plot=True):
+        h = self.getData()
+        
+        PassList, FailList = h.getPass(),h.getFail()
+        self.nBin1, self.nBin2 = len(PassList.bins1), len(PassList.bins2)
+        
+        
+        self.FitRes[h.name] = {}
+        self.eff[h.name] = {}
+        self.effStat[h.name] = {}
+        
+        ##################################
+        PassH, FailH = PassList[n], FailList[n]
+        
+        Pass, Fail = PassH.values, FailH.values
+        i,j = n%self.nBin2, int(np.floor(n/self.nBin2))
+        xc = CommonHelper.Plot.BinFormat(Bins=FailH.bins,Type="center")
+
+        pPass, pFail, BoundedFit = self.InitializeParams(i,j,"Optimized",isConv=False)
+
+        FitP, FitF, FitPSig, FitFSig,mP,mF = self.Fit_Curve_CHI(
+                                                    DATA_PASS = Pass, DATA_FAIL = Fail,
+                                                    pPass = pPass,pFail = pFail,
+                                                    Bounded = BoundedFit,
+                                                    )
+        fitRes = {  "names" : mP.values.keys(),
+                    "values": mP.values.values(),
+                    "error" : mP.errors.values()
+                   }
+        df = pd.DataFrame(fitRes,columns=fitRes.keys())
+        self.FitRes[h.name][PassH.name] = df
+        
+        fitRes = {  "names" : mF.values.keys(),
+                    "values": mF.values.values(),
+                    "error" : mF.errors.values()
+                   }
+        df = pd.DataFrame(fitRes,columns=fitRes.keys())
+        
+        self.FitRes[h.name][FailH.name] = df
+
+        #Yield[h.name][PassH.name] = mP.values.values()
+        #Yield[h.name][FailH.name] = mF.values.values()
+
+        ####################################
+
+        if Plot:
+            xs = np.arange(0,len(Pass))
+
+            argVoigt = FitP[2:5]
+            argExp   = FitP[5:9]
+
+            NSig = FitP[0]
+            NBkg = FitP[1]
+
+            SIG = CommonHelper.Math.Voigt(xs, *argVoigt)/np.sum(CommonHelper.Math.Voigt(xs, *argVoigt))
+            BKG = CommonHelper.Math.RooCMSShape(xs, *argExp)  /np.sum(CommonHelper.Math.RooCMSShape(xs, *argExp))
+
+
+            color = ['b','g','r']
+
+            print('--- Plotting Pass')    
+            self.PlotFitting(
+                        ax1,
+                        xc,
+                        NSig = NSig, NBkg = NBkg,
+                        DATA = Pass, SIG  = SIG, BKG  = BKG,
+                        #eta  = etaBINS[i], pt = ptBins[j],
+                        color = color,
+                       )
+
+            #######################################
+            xs = np.arange(len(Fail),len(Fail)*2)
+
+            argVoigt = FitF[2:5]
+            argExp   = FitF[5:9]
+
+            NSig = FitF[0]
+            NBkg = FitF[1]
+
+            SIG = CommonHelper.Math.Voigt(xs, *argVoigt)/np.sum(CommonHelper.Math.Voigt(xs, *argVoigt))
+            BKG = CommonHelper.Math.RooCMSShape(xs, *argExp)  /np.sum(CommonHelper.Math.RooCMSShape(xs, *argExp))
+
+
+            color = ['slateblue','olivedrab','firebrick']
+
+            print('--- Plotting Fail')
+            self.PlotFitting(
+                        ax2,
+                        xc,
+                        NSig = NSig, NBkg = NBkg,
+                        DATA = Fail, SIG  = SIG, BKG  = BKG,
+                        #eta  = etaBINS[i], pt = ptBins[j],
+                        color = color,
+                       )
+
+
+            ############################################
+
+        Num,dNum = FitP[0], FitPSig[0]
+        Dem, dDem = (FitP[0]+FitF[0]), FitPSig[0]+FitFSig[0]
+
+        self.eff[h.name][PassH.variable['extra']] = Num/Dem
+        self.effStat[h.name][PassH.variable['extra']] = Num/Dem*np.sqrt((dNum/Num)**2 + (dDem/Dem)**2)
+
+        if np.isnan(self.eff[h.name][PassH.variable['extra']]):
+            self.eff[h.name][PassH.variable['extra']] = 0.0
+            
+        return pPass, pFail, FitP, FitF
+
+
+
+
+    def GetYieldData(self, Plot=True, figsize = (20,20)):
+        Yield = {}
+        h = self.getData()
+        
+        self.FitRes[h.name] = {}
+        Yield[h.name] = {}
+        self.eff[h.name] = {}
+        self.effStat[h.name] = {}
+        
+        PassList, FailList = h.getPass(),h.getFail()
+        self.nBin1, self.nBin2 = len(PassList.bins1), len(PassList.bins2)
+        
+        if Plot:
+            fig1 = plt.figure(1,figsize=figsize)
+            fig2 = plt.figure(2,figsize=figsize)
+            #fig1 = plt.figure(1,figsize=(nBin2*5, nBin1*3))
+            #fig2 = plt.figure(2,figsize=(nBin2*5, nBin1*3))
+            #fig1 = plt.figure(1,figsize=(20,20))
+            #fig2 = plt.figure(2,figsize=(20,20))
+        
+        for n,PassH,FailH in zip(range(len(PassList)),PassList,FailList):
+            Pass, Fail = PassH.values, FailH.values
+            i,j = n%self.nBin2, int(np.floor(n/self.nBin2))
+            xc = CommonHelper.Plot.BinFormat(Bins=FailH.bins,Type="center")
+
+            pPass, pFail, BoundedFit = self.InitializeParams(i,j,"Optimized",isConv=False)
+
+            FitP, FitF, FitPSig, FitFSig,mP,mF = self.Fit_Curve_CHI(
+                                                        DATA_PASS = Pass, DATA_FAIL = Fail,
+                                                        pPass = pPass,pFail = pFail,
+                                                        Bounded = BoundedFit,
+                                                        )
+            fitRes = {  "names" : mP.values.keys(),
+                        "values": mP.values.values(),
+                        "error" : mP.errors.values()
+                       }
+            df = pd.DataFrame(fitRes,columns=fitRes.keys())
+
+            self.FitRes[h.name][PassH.name] = mP
+            self.FitRes[h.name][FailH.name] = mF
+
+            Yield[h.name][PassH.name] = mP.values.values()
+            Yield[h.name][FailH.name] = mF.values.values()
+            
+            ####################################
+            
+            if Plot:
+                xs = np.arange(0,len(Pass))
+
+                argVoigt = FitP[2:5]
+                argExp   = FitP[5:9]
+
+                NSig = FitP[0]
+                NBkg = FitP[1]
+
+                SIG = CommonHelper.Math.Voigt(xs, *argVoigt)/np.sum(CommonHelper.Math.Voigt(xs, *argVoigt))
+                BKG = CommonHelper.Math.RooCMSShape(xs, *argExp)  /np.sum(CommonHelper.Math.RooCMSShape(xs, *argExp))
+
+
+                plt.figure(1)
+                ax = plt.subplot(self.nBin2, self.nBin1, n+1)
+                color = ['b','g','r']
+
+                print('--- Plotting Pass')    
+                self.PlotFitting(
+                            ax,
+                            xc,
+                            NSig = NSig, NBkg = NBkg,
+                            DATA = Pass, SIG  = SIG, BKG  = BKG,
+                            #eta  = etaBINS[i], pt = ptBins[j],
+                            color = color,
+                           )
+
+                #######################################
+                xs = np.arange(len(Fail),len(Fail)*2)
+
+                argVoigt = FitF[2:5]
+                argExp   = FitF[5:9]
+
+                NSig = FitF[0]
+                NBkg = FitF[1]
+
+                SIG = CommonHelper.Math.Voigt(xs, *argVoigt)/np.sum(CommonHelper.Math.Voigt(xs, *argVoigt))
+                BKG = CommonHelper.Math.RooCMSShape(xs, *argExp)  /np.sum(CommonHelper.Math.RooCMSShape(xs, *argExp))
+
+
+                plt.figure(2)
+                ax1 = plt.subplot(self.nBin2, self.nBin1, n+1)
+                color = ['slateblue','olivedrab','firebrick']
+
+                print('--- Plotting Fail')
+                self.PlotFitting(
+                            ax1,
+                            xc,
+                            NSig = NSig, NBkg = NBkg,
+                            DATA = Fail, SIG  = SIG, BKG  = BKG,
+                            #eta  = etaBINS[i], pt = ptBins[j],
+                            color = color,
+                           )
+
+
+                ############################################
+
+            Num,dNum = FitP[0], FitPSig[0]
+            Dem, dDem = (FitP[0]+FitF[0]), FitPSig[0]+FitFSig[0]
+
+            self.eff[h.name][PassH.variable['extra']] = Num/Dem
+            self.effStat[h.name][PassH.variable['extra']] = Num/Dem*np.sqrt((dNum/Num)**2 + (dDem/Dem)**2)
+
+            if np.isnan(self.eff[h.name][PassH.variable['extra']]):
+                self.eff[h.name][PassH.variable['extra']] = 0.0
+        
+        if Plot:
+            fig1.tight_layout()        
+            fig2.tight_layout() 
+
+        return Yield
+
+        
+    def Fit_Curve_CHI(self,
+                      DATA_PASS, DATA_FAIL,
+                      pPass,pFail,
+                      Bounded,
+                      error =  [
+                                1,1,
+                                0.001,0.01,1,0.01,
+                                0.001,0.001,0.001
+                                ],
+                     ):
+        
+        ####################
+        xFit = np.arange(0,len(DATA_PASS))
+
+        chi2 =lambda NSig , NBkg , \
+                     sig  , Gamma, mean, \
+                     alpha, beta , peak, gamma : CommonHelper.Stat.CHI2(  DATA_PASS,
+                                                        CommonHelper.Math.Voigt_CMS(
+                                                            xc = xFit, \
+                                                            NSig=NSig , NBkg=NBkg , \
+                                                            sig = sig  , Gamma  = Gamma, mean = mean, \
+                                                            alpha = alpha, beta = beta , peak = peak, gamma = gamma,  
+                                                            ) 
+                                                        )    
+
+
+        x0 = pPass
+        mP = Minuit( chi2,
+                    NSig  =  x0[0], NBkg  =  x0[1],
+                    sig   =  x0[2], Gamma =  x0[3], mean =  x0[4],
+                    alpha =  x0[5], beta  =  x0[6], peak =  x0[7], gamma = x0[8], 
+                    error_NSig  =  error[0], error_NBkg  =  error[1],
+                    error_sig   =  error[2], error_Gamma =  error[3], error_mean =  error[4],
+                    error_alpha =  error[5], error_beta  =  error[6], error_peak =  error[7], error_gamma = error[8], 
+                    limit_NSig  =  (Bounded[0][0],Bounded[1][0]), limit_NBkg  =  (Bounded[0][1],Bounded[1][1]),
+                    limit_sig   =  (Bounded[0][2],Bounded[1][2]), limit_Gamma =  (Bounded[0][3],Bounded[1][3]), limit_mean =  (Bounded[0][4],Bounded[1][4]),
+                    limit_alpha =  (Bounded[0][5],Bounded[1][5]), limit_beta  =  (Bounded[0][6],Bounded[1][6]), limit_peak =  (Bounded[0][7],Bounded[1][7]), limit_gamma = (Bounded[0][8],Bounded[1][8]), 
+                    errordef = 0.5,
+                  )    
+
+        mP.migrad()
+
+
+
+        FitsPass    = mP.values.values()
+        FitsPassSig = mP.errors.values()
+
+        ################################################
+        xFit = np.arange(len(DATA_PASS),len(DATA_PASS)*2)
+
+        chi2 =lambda NSig , NBkg , \
+                     sig  , Gamma, mean, \
+                     alpha, beta , peak, gamma : CommonHelper.Stat.CHI2(  DATA_FAIL,
+                                                        CommonHelper.Math.Voigt_CMS(
+                                                            xc = xFit, \
+                                                            NSig=NSig , NBkg=NBkg , \
+                                                            sig = sig  , Gamma  = Gamma, mean = mean, \
+                                                            alpha = alpha, beta = beta , peak = peak, gamma = gamma,  
+                                                            ) 
+                                                        )   
+
+        x0 = pFail
+        mF = Minuit( chi2,
+                    NSig  =  x0[0], NBkg  =  x0[1],
+                    sig   =  x0[2], Gamma =  x0[3], mean =  x0[4],
+                    alpha =  x0[5], beta  =  x0[6], peak =  x0[7], gamma = x0[8], 
+                    error_NSig  =  error[0], error_NBkg  =  error[1],
+                    error_sig   =  error[2], error_Gamma =  error[3], error_mean =  error[4],
+                    error_alpha =  error[5], error_beta  =  error[6], error_peak =  error[7], error_gamma = error[8], 
+                    limit_NSig  =  (Bounded[0][0],Bounded[1][0]), limit_NBkg  =  (Bounded[0][1],Bounded[1][1]),
+                    limit_sig   =  (Bounded[0][2],Bounded[1][2]), limit_Gamma =  (Bounded[0][3],Bounded[1][3]), limit_mean =  (Bounded[0][4],Bounded[1][4]),
+                    limit_alpha =  (Bounded[0][5],Bounded[1][5]), limit_beta  =  (Bounded[0][6],Bounded[1][6]), limit_peak =  (Bounded[0][7],Bounded[1][7]), limit_gamma = (Bounded[0][8],Bounded[1][8]), 
+                    errordef = 0.5,
+                  )    
+
+        mF.migrad()
+
+
+        FitsFail    = mF.values.values()
+        FitsFailSig = mF.errors.values()
+
+        return FitsPass, FitsFail, FitsPassSig, FitsFailSig,mP,mF
+
+
+    def PlotFitting(self,
+                    ax,
+                    xc,
+                    NSig ,NBkg,
+                    DATA, SIG, BKG,
+                    #eta, pt,
+                    color,
+                   ):
+        TemplatePlot    = CommonHelper.Math.Template(NSig,NBkg, SIG, BKG)
+        TemplatePlotBkg = NBkg*BKG/np.sum(BKG)
+        DataPlot        = DATA
+
+        ax.plot(xc,    TemplatePlot, color = color[0], linestyle='--', label=    'Fit')
+        ax.plot(xc, TemplatePlotBkg, color = color[1], linestyle='--', label='Fit Bkg')
+        ax.plot(xc,        DataPlot, color = color[2], linestyle= '-', label=   'Data')
+
+        ax.legend()
+        ax.grid(linestyle='--')
+
+        '''
+        if j == 0:
+            ax.set_ylabel('Eta ['+str(round(eta[0],2))+','+str(round(eta[1],2))+']'  )        
+        if i == 0:
+            ax.set_title('Pt ['+str(pt[0])+','+str(pt[1])+']' )
+        '''
+    
+    def EffPlot(self,figpath,bins1,bins2):
+        
+        fileOut = TFile(figpath,"recreate")
+        tree = TTree("eff_photon","eff_photon")
+
+        gStyle.SetOptStat(0)
+        #################################################
+
+        Bins1 = array.array("f",CommonHelper.Plot.BinFormat(bins1,Type='edges'))
+        Bins2 = array.array("f",CommonHelper.Plot.BinFormat(bins2,Type='edges'))
+
+
+        nBin1,nBin2 = self.nBin1-2, self.nBin2-1
+        histDraw = TH2F("EGamma_eff","Eff",
+                      nBins1, Bins1,
+                      nBins2, Bins2)
+
+
+        nBin1,nBin2 = self.nBin1-1, self.nBin2-1
+        hist2d = TH2F("EGamma_eff","Eff",
+                      nBins1 ,Bins1,
+                      nBins2,Bins2)
+
+        nBin1,nBin2 = self.nBin1-2, self.nBin2-1
+        histDraw = TH2F("EGamma_eff_draw_stat","Eff",
+                      nBins1, Bins1,
+                      nBins2, Bins2)
+        
+        nBin1,nBin2 = self.nBin1-1, self.nBin2-1
+        hist2d = TH2F("EGamma_eff_stat","Eff",
+                      nBins1 ,Bins1,
+                      nBins2,Bins2)
+
+
+        #################################################
+        tree.Branch("eff",hist2d,"TH2F")
+
+
+        for j in range(nBin1):
+            hist2d.GetZaxis().SetRangeUser(0.6,1.1)
+
+            for i in range(nBin2):
+                EFF = self.effMC[j][0]
+                EFFStat = self.effMCStat[j][0]
+
+                hist2d.SetBinContent(int(j)+1, int(i)+1, EFF)
+                histDraw.SetBinContent(int(j)+1, int(i)+1, EFF)
+
+                stat2d.SetBinContent(int(j)+1, int(i)+1, EFFStat)
+                statDraw.SetBinContent(int(j)+1, int(i)+1, EFFStat)
+                tree.Fill()
+                
+        hist2d.GetZaxis().SetRangeUser(0.6,0.95)
+
+        fileOut.Write()
+
+        return hist2d
+        
+        
+
+
+if __name__ == "__main__":
+    HS = HistoSampleEff()
+    #print(HS._HistoSampleEff__getEffConf())
+    print(HS.InitializeParams(i=1,j=1,BinType="Optimized", isConv=True))
+    #HS.EffPlot("",[0,1,2,4],[0,1,2,4])
+
+
+
+
